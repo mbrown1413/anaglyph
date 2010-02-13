@@ -5,15 +5,7 @@
 #include <cv.h>
 #include <highgui.h>
 
-CvScalar combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
-{
-    return cvScalar(
-        left_pixel.val[0],
-        left_pixel.val[0],
-        right_pixel.val[0],
-        0
-    );
-}
+#include "methods/interface.h"
 
 IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye, int offset_x)
 {
@@ -61,6 +53,7 @@ int main(int argc, char** argv)
     IplImage* stereo = NULL;
 
     unsigned int frames = 0;
+    int key;
     for (frames=1; 1; frames++)
     {
         if (offset_x != previous_offset_x)
@@ -70,7 +63,13 @@ int main(int argc, char** argv)
             cvShowImage("Stereo", stereo);
             previous_offset_x = offset_x;
         }
-        cvWaitKey(100);
+        key = cvWaitKey(100);
+        if ( (char) key == 27) { // Esc to exit
+            break;
+        }
+        switch( (char) key) {
+            // Keyboard Commands
+        }
 
     }
 
