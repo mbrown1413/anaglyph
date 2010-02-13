@@ -1,0 +1,9 @@
+Features:
+    - Option for jpg output, or viewing window output
+    - Video input
+
+Methods:
+    - Least Squares
+    - Midpoint (Is this a different name for another method?)
+    - Dubois
+    - McAllister
