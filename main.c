@@ -40,18 +40,22 @@ int main(int argc, char** argv)
     cvNamedWindow("Stereo", CV_WINDOW_AUTOSIZE);
     cvCreateTrackbar("x Offset", "Stereo", &offset_x, 255, NULL);
 
-    /*
-    char left_eye_image_name[100];
-    char right_eye_image_name[100];
-    sprintf(left_eye_image_name, "images/%s-left.jpg", argv[1]);
-    sprintf(right_eye_image_name, "images/%s-right.jpg", argv[1]);
-    IplImage* left_eye = cvLoadImage(left_eye_image_name, 0);
-    IplImage* right_eye = cvLoadImage(right_eye_image_name, 0);
-    */
-    //TODO: Handle incorrect arguments nicely
+    if (argc != 3) {
+        printf("PUT USAGE MESSAGE HERE\n");
+        exit(1);
+    }
     IplImage* left_eye = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR);
     IplImage* right_eye = cvLoadImage(argv[2], CV_LOAD_IMAGE_COLOR);
     IplImage* stereo = NULL;
+
+    if (left_eye == NULL) {
+        printf("Could not open left eye image.\n");
+        exit(1);
+    }
+    if (right_eye == NULL) {
+        printf("Could not open right eye image.\n");
+        exit(1);
+    }
 
     unsigned int frames = 0;
     int key;

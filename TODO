@@ -1,4 +1,9 @@
+- Usage message
+
+Bugs:
+
 Features:
+    - Add an fps counter, or time elapsed.
     - Option for jpg output, or viewing window output
     - Video input
 

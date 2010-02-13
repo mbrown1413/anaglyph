@@ -2,6 +2,9 @@
  * The Modified Photoshop Method
  * Just like the photoshop method, except the left eye is converted to
  * greyscale first.  Uses NTSC luminance standard for greyscale.  
+ * 
+ * Baised on Zhe Zhang's thesis: "An Application of Linear Optimization in
+ * Anaglyph Stereo Image Rendering"
  */
 
 #include <stdio.h>
@@ -22,4 +25,3 @@ CvScalar combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         0
     );
 }
-
