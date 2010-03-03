@@ -35,13 +35,14 @@ IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye, int offset_x)
 
 int main(int argc, char** argv)
 {
-    int offset_x = 127; // Added offset to left eye
+    int offset_x = 127; // Added offset to left eye.  127 is center
     int previous_offset_x = -1;
     cvNamedWindow("Stereo", CV_WINDOW_AUTOSIZE);
     cvCreateTrackbar("x Offset", "Stereo", &offset_x, 255, NULL);
 
     if (argc != 3) {
-        printf("PUT USAGE MESSAGE HERE\n");
+        printf("Usage: %s <left-eye> <right-eye>\n", argv[0]);
+        printf("The two arguments as of now, must be image files.  In the future, ffmpeg, avi and webcam support will be added.\n");
         exit(1);
     }
     IplImage* left_eye = cvLoadImage(argv[1], CV_LOAD_IMAGE_COLOR);
@@ -59,15 +60,26 @@ int main(int argc, char** argv)
 
     unsigned int frames = 0;
     int key;
+    clock_t time_start;
+    clock_t time_end;
+    float total_elapsed = 0;
     for (frames=1; 1; frames++)
     {
-        if (offset_x != previous_offset_x)
+
+        time_start = clock();
+
+        //if (offset_x != previous_offset_x)
         {
             cvFree(&stereo); // Doesn't do anything the first time through
             stereo = combine_stereo(left_eye, right_eye, offset_x-127);
             cvShowImage("Stereo", stereo);
             previous_offset_x = offset_x;
         }
+
+        time_end = clock();
+        total_elapsed += (float) (time_end-time_start)/CLOCKS_PER_SEC;
+        printf("Total fps: %f\n", frames/total_elapsed);
+
         key = cvWaitKey(100);
         if ( (char) key == 27) { // Esc to exit
             break;
