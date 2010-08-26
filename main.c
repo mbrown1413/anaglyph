@@ -24,7 +24,7 @@ IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye, int offset_x)
                 left_pixel = cvScalar(0,0,0,0);
             }
             CvScalar right_pixel = cvGet2D(right_eye, y, x);
-            CvScalar stereo_pixel = combine_pixels(left_pixel, right_pixel);
+            CvScalar stereo_pixel = method_combine_pixels(left_pixel, right_pixel);
             //printf("%f %f %f\n", left_pixel.val[0], left_pixel.val[1], left_pixel.val[2]);
             cvSet2D(stereo, y, x, stereo_pixel);
         }
@@ -58,6 +58,8 @@ int main(int argc, char** argv)
         exit(1);
     }
 
+    method_init();
+
     unsigned int frames = 0;
     int key;
     clock_t time_start;
@@ -89,6 +91,8 @@ int main(int argc, char** argv)
         }
 
     }
+
+    method_free();
 
     return 0;
 }

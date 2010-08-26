@@ -12,7 +12,7 @@
 
 #include "interface.h"
 
-CvScalar combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
+CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 {
     double left_greyscale = 0.114*left_pixel.val[0] +
                                    0.587*left_pixel.val[1] +
@@ -25,3 +25,6 @@ CvScalar combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         0
     );
 }
+
+void method_init() {}
+void method_free() {}

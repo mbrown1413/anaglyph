@@ -40,7 +40,7 @@ float clip(float num)
     else return num;
 }
 
-CvScalar combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
+CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 {
     // These each stand for left blue, right blue, etc.
     double lb = left_pixel.val[0];
@@ -65,3 +65,6 @@ CvScalar combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 
     return result;
 }
+
+void method_init() {}
+void method_free() {}

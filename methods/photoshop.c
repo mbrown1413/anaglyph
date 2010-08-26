@@ -10,7 +10,7 @@
 
 #include "interface.h"
 
-CvScalar combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
+CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 {
     return cvScalar(
         left_pixel.val[0],
@@ -19,3 +19,6 @@ CvScalar combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         0
     );
 }
+
+void method_init() {}
+void method_free() {}
