@@ -1,14 +1,5 @@
-- Usage message
-
 Bugs:
 
-Features:
-    - Add an fps counter, or time elapsed.
-    - Option for jpg output, or viewing window output
+Features to Implement:
+    - Option for jpg output, avi output, or viewing window output
     - Video input
-
-Methods:
-    - Least Squares
-    - Midpoint
-    - Dubois
-    - McAllister

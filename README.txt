@@ -39,9 +39,9 @@ documentation:
 
 http://opencv.willowgarage.com/wiki/Mac_OS_X_OpenCV_Port
 
----------------------
-Compiling and Running
----------------------
+---------
+Compiling
+---------
 To compile, type the "make" command inside the root of the repository.  This
 reads the makefile located in the file "makefile" to read the compiler commands
 and run them.  The executables generated, one for each method, will be placed
@@ -57,12 +57,20 @@ Mac Specifics
 When using MacPorts, in my experience, the include files are located at
 "/opt/local/include" and the object files are located at "/opt/local/lib".
 
+-------
+Running
+-------
+Run one of the executables in bin/<method_name> and pass in a left eye image
+and a right eye image as arguments.  There are some sample anaglyph images in
+the images/ directory, with the files clearly labeled as corresponding left and
+right eye images.
+
 -----------------
 Creating a Method
 -----------------
 If you want to create your own anaglyph method, create a file named
 "methods/<method_name>.c".  This file will automatically be compiled after
-following the steps in the "Compiling and Running" section and the executable
+following the steps in the "Compiling" section and the executable
 file will be put in bin/.
 
 Look in methods/interface.h.  This is the exact set of function prototypes that
