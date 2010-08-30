@@ -1,4 +1,4 @@
-/** ps.c
+/** photoshop.c
  * The Photoshop Method
  * A simple RGB filter for each eye to determine the pixel color.
  * 
