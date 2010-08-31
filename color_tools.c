@@ -1,21 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 
-void mult_matrices(double a[][3], double b[3], double result[3]);
-void print_matrix(double a[3]);
-void element_wise_multiply(double matrix[][3], double vector[3], double result[][3]);
-void CIELab_A_matrixes(double Al[][3], double Ar[][3], double CIEmatrix[][3]);
-double cielabf(double U, double Un);
-double Lstar(double x, double y, double z); 
-double Astar(double x, double y, double z);
-double Bstar(double x, double y, double z); 
-
-double CLstarRight(double rgb[3]);
-double CAstarRight(double rgb[3]);
-double CBstarRight(double rgb[3]);
-double CLstarLeft(double rgb[3]);
-double CAstarLeft(double rgb[3]);
-double CBstarLeft(double rgb[3]);
+#include "color_tools.h"
 
 double Al[3][3] = {
     {0.1840, 0.0179, 0.0048}, 
@@ -85,7 +71,7 @@ void CIEmatricesLandR(double CIEmatrixL[][3], double CIEmatrixR[][3])
     mult_matrices(CIEmatrix, RGBwhite, CIEmatrixconstant);
     mult_matrices(Ar, RGBwhite, CIErightconstant);
 
-    //compute normalization values n1, ..., n6 so that that whites agree in \
+    //compute normalization values n2, ..., n6 so that that whites agree in
     //CIE color space
     double n[6];
     for(int i=0; i<3; i++){
