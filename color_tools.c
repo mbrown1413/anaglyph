@@ -45,7 +45,7 @@ void print_matrix(double a[3])
    int i; 
    for (i=0; i<3; i++)
    {
-            printf("%f\n", a[i]);
+            //printf("%f\n", a[i]);
    }
 }
 
@@ -101,27 +101,27 @@ double cielabf(double U, double Un)
 {
     double returnval;
     double result = U/Un;
-    printf("result = %f\n", result);
+    //printf("result = %f\n", result);
     if(result > .008856) {
         returnval = pow(result,1.0/3);
     } else {
         returnval = (7.787*result+16.0/116);
     }
-    printf("cielabf result is %f\n", returnval);
+    //printf("cielabf result is %f\n", returnval);
     return returnval;
 }
 
 double Lstar(double x, double y, double z) 
 {
     double r = (116.0 * cielabf(y, Yn) - 16.0);
-    printf("Lstar is %f\n", r);
+    //printf("Lstar is %f\n", r);
     return r;
 }
 
 double Astar(double x, double y, double z)
 {
     double r = 500.0 * (cielabf(x, Xn) - cielabf(y, Yn));
-    printf("Astar is  %f\n", r);
+    //printf("Astar is  %f\n", r);
     return r;
 }
 
@@ -153,7 +153,7 @@ double CBstarLeft(double rgb[3])
 {
     double CIELeft[3];
     CIE(Al, rgb, CIELeft);
-    printf("CIELeft is %f, %f, %f\n", CIELeft[0], CIELeft[1], CIELeft[2]);
+    //printf("CIELeft is %f, %f, %f\n", CIELeft[0], CIELeft[1], CIELeft[2]);
     return Bstar(CIELeft[0], CIELeft[1], CIELeft[2]);
 }
 
