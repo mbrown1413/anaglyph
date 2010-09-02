@@ -2,3 +2,4 @@ makefile
 bin/*
 images/*
 methods/bin/*
+*.swp
