@@ -12,6 +12,7 @@
 #define RIGHT_ASTAR 4
 #define RIGHT_BSTAR 5
 
+#include <stdio.h>
 #include <cv.h>
 #include <levmar.h>
 
@@ -21,14 +22,16 @@ void minimization_function(double *parameters, double *x, int m, int n, void *da
     x[LEFT_LSTAR] = CLstarLeft(&parameters[0]);
     x[LEFT_ASTAR] = CAstarLeft(&parameters[0]);
     x[LEFT_BSTAR] = CBstarLeft(&parameters[0]);
-    x[RIGHT_LSTAR] = CLstarRight(&parameters[3]);
-    x[RIGHT_ASTAR] = CAstarRight(&parameters[3]);
-    x[RIGHT_BSTAR] = CBstarRight(&parameters[3]);
+    x[RIGHT_LSTAR] = CLstarRight(&parameters[0]);
+    x[RIGHT_ASTAR] = CAstarRight(&parameters[0]);
+    x[RIGHT_BSTAR] = CBstarRight(&parameters[0]);
 }
 
 CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 {
     // These are the parameters that are varied
+    // They are the starting values and they are modified by levmar until the
+    // function is minimized.
     double parameters[3] = {
         left_pixel.val[2], //R
         left_pixel.val[1], //G
@@ -56,7 +59,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         CBstarRight(right_pixel_rgb)
     };
 
-    int numebr_of_iterations = dlevmar_dif(
+    int number_of_iterations = dlevmar_dif(
         minimization_function,
         parameters,
         target,
@@ -69,6 +72,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         NULL, // Covariance matrix
         NULL  // Extra data not needed
     );
+    //printf("Iterations: %d\n", number_of_iterations);
     return cvScalar(
         parameters[2], //B
         parameters[1], //G
