@@ -12,7 +12,8 @@ LEVMAR_DIRECTORY=/home/michael/install/levmar/
 
 SHELL = /bin/sh
 CC=gcc
-LEVMAR_FLAGS=-I$(LEVMAR_DIRECTORY) -L$(LEVMAR_DIRECTORY) -L/usr/local/lib -llevmar -llapack -lblas -lf2c  -lm -Wl,-t -L./ -u MAIN__ \
+LEVMAR_CC_FLAGS=-I$(LEVMAR_DIRECTORY)
+LEVMAR_LD_FLAGS=-L$(LEVMAR_DIRECTORY) -llapack -lblas -lf2c -u MAIN__ \
     $(LEVMAR_DIRECTORY)/Axb.o \
     $(LEVMAR_DIRECTORY)/lmbc.o \
     $(LEVMAR_DIRECTORY)/lmblec.o \
@@ -20,7 +21,7 @@ LEVMAR_FLAGS=-I$(LEVMAR_DIRECTORY) -L$(LEVMAR_DIRECTORY) -L/usr/local/lib -llevm
     $(LEVMAR_DIRECTORY)/lmlec.o \
     $(LEVMAR_DIRECTORY)/lm.o \
     $(LEVMAR_DIRECTORY)/misc.o
-CFLAGS=-g --std=c99 -pedantic -Wall -Werror -Wno-unused -I./ $(LEVMAR_FLAGS)
+CFLAGS=-g --std=c99 -pedantic -Wall -Werror -Wno-unused -I./ $(LEVMAR_CC_FLAGS)
 # TODO: This might should use pkg-config for compatibility, but many opencv
 # installations won't have .pc files, such as MacPorts installations.  It is
 # still undecided exactly what to do about this compatability, but for now,
@@ -34,7 +35,7 @@ all: bin/ methods/bin/ $(METHOD_EXECUTABLES)
 
 # Method Executable
 bin/%: methods/bin/%.o bin/main.o bin/color_tools.o
-	$(CC) $(OPENCV_FLAGS) $(CFLAGS) $^ -o $@
+	$(CC) $(OPENCV_FLAGS) $(LEVMAR_LD_FLAGS) $(CFLAGS) $^ -o $@
 
 # Objects
 bin/%.o: %.c
