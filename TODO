@@ -1,10 +1,18 @@
 The .o files are deleted at the end of the make process.  Make has to recompile everything if one file changes because of this.
 
+Compiling process:
+    - Write an SConstruct so people can compile with either Make or Scons
+    - Maybe make levmar optional
+
 For McAllister method:
     - Write Jacobian and give it to levmar
     - Lookup table for minimization function
     - Statistics on what takes the longest in the levmar call
     - Specify options to levmar to change the termination conditions
+    - Try out Gauss-Newton.  It will probably be faster.  The only problem that
+      could occur is if the starting value is not close enough, but it should
+      be fine.
+    - Try different starting values.
 
 Features to Implement:
     - Option for jpg output, avi output, or viewing window output

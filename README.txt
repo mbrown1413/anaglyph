@@ -28,12 +28,13 @@ Dependencies
 * gcc
 * OpenCV
 * make
+* levmar
 
 If you want to read video, you will need to compile OpenCV with FFMPEG support.
 
 Mac Specifics
 `````````````
-MacPorts can be used to install all of the above.  FFMPEG support will be built
+MacPorts can be used to install all of the above except for levmar.  FFMPEG support will be built
 into OpenCV as well.  For more details on Mac installation, read OpenCV's
 documentation:
 
@@ -54,7 +55,7 @@ where to look for object files.
 
 Mac Specifics
 `````````````
-When using MacPorts, in my experience, the include files are located at
+When using MacPorts, in my experience, the include files for OpenCV are located at
 "/opt/local/include" and the object files are located at "/opt/local/lib".
 
 -------
