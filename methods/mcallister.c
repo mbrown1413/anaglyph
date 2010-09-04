@@ -18,6 +18,8 @@
 
 #include "color_tools.h"
 
+double* working_memory;
+
 void minimization_function(double *parameters, double *x, int m, int n, void *data) {
     x[LEFT_LSTAR] = CLstarLeft(&parameters[0]);
     x[LEFT_ASTAR] = CAstarLeft(&parameters[0]);
@@ -25,6 +27,10 @@ void minimization_function(double *parameters, double *x, int m, int n, void *da
     x[RIGHT_LSTAR] = CLstarRight(&parameters[0]);
     x[RIGHT_ASTAR] = CAstarRight(&parameters[0]);
     x[RIGHT_BSTAR] = CBstarRight(&parameters[0]);
+}
+
+void jacobian(double *p, double *jac, int m, int n, void *data) {
+
 }
 
 CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
@@ -68,7 +74,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         MAX_ITERATIONS,
         NULL, //TODO: opts
         NULL, //TODO: info
-        NULL, //TODO: Working memory.
+        working_memory,
         NULL, // Covariance matrix
         NULL  // Extra data not needed
     );
@@ -81,5 +87,19 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
     );
 }
 
-void method_init() {}
-void method_free() {}
+void method_init() {
+
+    working_memory = (double*) malloc((LM_DIF_WORKSZ(3, 6))*sizeof(double));
+
+    // Verify the Jacobian
+    /*
+    double err[16];
+    double p[3] = {127, 127, 127};
+    dlevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err); 
+    for(i=0; i<n; ++i) printf("Gradient %d, Error %g\n", i, err[i]);
+    */
+
+}
+void method_free() {
+    free(working_memory);
+}
