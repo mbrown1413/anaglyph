@@ -23,6 +23,10 @@ double Xn = 111.144;
 double Yn = 100.0;
 double Zn = 35.201;
 
+double CIEmatrixL[3][3];
+double CIEmatrixR[3][3];
+
+
 void mult_matrices(double a[][3], double b[3], double result[3])
 {
     for (int i=0; i<3; i++) {
@@ -58,32 +62,33 @@ values from the picture by to get the correct filter colors for the
 left and right eye views
 */
 
-void CIEmatricesLandR(double CIEmatrixL[][3], double CIEmatrixR[][3])
+void CIEmatricesLandR()
 {
     double CIEleftconstant[3];
     double CIErightconstant[3];
-    double CIEmatrixconstant[3];
+    double CIEmatrixrightconstant[3];
+    double CIEmatrixleftconstant[3];
     double RGBwhite[3] = {255, 255, 255};
 
     mult_matrices(Al, RGBwhite, CIEleftconstant);
     mult_matrices(Ar, RGBwhite, CIErightconstant);
 
-    mult_matrices(CIEmatrix, RGBwhite, CIEmatrixconstant);
-    mult_matrices(Ar, RGBwhite, CIErightconstant);
+    mult_matrices(CIEmatrix, RGBwhite, CIEmatrixleftconstant);
+    mult_matrices(CIEmatrix, RGBwhite, CIEmatrixrightconstant);
 
     //compute normalization values n2, ..., n6 so that that whites agree in
     //CIE color space
     double n[6];
     for(int i=0; i<3; i++){
-        n[i] = CIEleftconstant[i] / CIEmatrixconstant[i];
+        n[i] = CIEleftconstant[i] / CIEmatrixleftconstant[i];
     }
     for(int i=3; i<6; i++){
-        n[i] = CIErightconstant[i] / CIEmatrixconstant[i];
+        n[i] = CIErightconstant[i-3] / CIEmatrixrightconstant[i-3];
     }
-
+    
     //reset the CIE conversion for the left and right eye RGB values
     element_wise_multiply(CIEmatrix, n, CIEmatrixL);
-    element_wise_multiply(CIEmatrix, &n[4], CIEmatrixR);
+    element_wise_multiply(CIEmatrix, &n[3], CIEmatrixR);
 
 }
 
@@ -92,7 +97,7 @@ void element_wise_multiply(double matrix[][3], double vector[3], double result[]
 {
     for (int i=0; i<3; i++){
         for(int j=0; j<3; j++){
-            result[i][j] = matrix[i][j] * vector[j];
+            result[i][j] = matrix[i][j] * vector[i];
         }
     }
 }
@@ -128,6 +133,75 @@ double Astar(double x, double y, double z)
 double Bstar(double x, double y, double z) 
 {
     return (200.0 * (cielabf(y, Yn) - cielabf(z, Zn)));
+}
+
+double Lstarleft(double rgb[3])
+{
+    double CIEmatrixLeft[3];
+
+    mult_matrices(CIEmatrixL, rgb, CIEmatrixLeft);
+    /*for (int i=0; i<3; i++){
+        for(int j=0; j<3; j++) {
+            printf("%f ", CIEmatrixL[i][j]);
+        }
+        printf("\n");
+    }*/
+    //printf("RGB: %f,%f,%f\n", rgb[0], rgb[1], rgb[2]);
+    double test = Lstar(CIEmatrixLeft[0], CIEmatrixLeft[1], CIEmatrixLeft[2]);
+    //printf("Lstarleft is %f\n", test);
+    return test;
+
+}
+
+double Astarleft(double rgb[3])
+{
+    double CIEmatrixLeft[3];
+    mult_matrices(CIEmatrixL, rgb, CIEmatrixLeft);
+    double test = Astar(CIEmatrixLeft[0], CIEmatrixLeft[1], CIEmatrixLeft[2]); 
+    //printf("Astarleft is %f\n", test);
+    return test;
+
+}
+
+double Bstarleft(double rgb[3])
+{
+    double CIEmatrixLeft[3];
+    mult_matrices(CIEmatrixL, rgb, CIEmatrixLeft);
+    double test = Bstar(CIEmatrixLeft[0], CIEmatrixLeft[1], CIEmatrixLeft[2]);
+    //printf("Bstarleft is %f\n", test);
+    return test;
+}
+
+double Lstarright(double rgb[3])
+{
+    double CIEmatrixRight[3];
+    mult_matrices(CIEmatrixR, rgb, CIEmatrixRight);
+    /*for (int i=0; i<3; i++){
+        for(int j=0; j<3; j++) {
+            printf("%f ", CIEmatrixR[i][j]);
+        }
+        printf("\n");
+    }*/
+
+    double test = Lstar(CIEmatrixRight[0], CIEmatrixRight[1], CIEmatrixRight[2]);
+    //printf("Lstarright is %f\n", test);
+    return test;
+}
+
+double Astarright(double rgb[3])
+{
+    double CIEmatrixRight[3];
+    mult_matrices(CIEmatrixR, rgb, CIEmatrixRight);
+    return Astar(CIEmatrixRight[0], CIEmatrixRight[1], CIEmatrixRight[2]);
+
+}
+
+double Bstarright(double rgb[3])
+{
+    double CIEmatrixRight[3];
+    mult_matrices(CIEmatrixR, rgb, CIEmatrixRight);
+    return Bstar(CIEmatrixRight[0], CIEmatrixRight[1], CIEmatrixRight[2]);
+
 }
 
 void CIE(double A[][3], double rgb[3], double result[3])
@@ -178,4 +252,23 @@ double CBstarRight(double rgb[3])
     return Bstar(CIEright[0], CIEright[1], CIEright[2]);
 }
 
+double LCD_Lstar(double rgb[3])
+{
+    double lcd_CIE[3];
+    CIE(CIEmatrix, rgb, lcd_CIE);
+    return Lstar(lcd_CIE[0], lcd_CIE[1], lcd_CIE[2]);
+}
 
+double LCD_Astar(double rgb[3])
+{
+    double lcd_CIE[3];
+    CIE(CIEmatrix, rgb, lcd_CIE);
+    return Astar(lcd_CIE[0], lcd_CIE[1], lcd_CIE[2]);
+}
+
+double LCD_Bstar(double rgb[3])
+{
+    double lcd_CIE[3];
+    CIE(CIEmatrix, rgb, lcd_CIE);
+    return Bstar(lcd_CIE[0], lcd_CIE[1], lcd_CIE[2]);
+}
