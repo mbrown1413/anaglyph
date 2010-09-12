@@ -103,6 +103,12 @@ int main(int argc, char** argv)
         printf("Could not open right eye image.\n");
         exit(1);
     }
+    if (left_eye->width != right_eye->width ||
+        left_eye->height != right_eye->height)
+    {
+        printf("\nError: Right and left eye image must have the same dimmensions!\n\n");
+        usage_message(argv[0]);
+    }
 
     method_init();
 
