@@ -14,9 +14,9 @@ IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye, int offset_x)
 {
     IplImage* stereo = cvCreateImage(cvSize(left_eye->width, left_eye->height), IPL_DEPTH_8U, 3);
 
-    for (int x=0; x<stereo->width-1; x++)
+    for (int x=0; x<stereo->width; x++)
     {
-        for (int y=0; y<stereo->height-1; y++)
+        for (int y=0; y<stereo->height; y++)
         {
             //TODO: Optimize pixel setting/getting
             CvScalar left_pixel;
