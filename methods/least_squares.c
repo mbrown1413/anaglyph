@@ -27,7 +27,7 @@
 // See above about the calculation for how this matrix is used.
 // These numbers came from "Computing Anaglyphs using Least Squares
 // Approximation in CIE Color Space", by David McAllister.
-static const double p[3][6] = {
+static const float p[3][6] = {
     { 0.4155,  0.4710,  0.1670,   -0.0109, -0.0365, -0.0060},
     {-0.0458, -0.0484, -0.0258,    0.3756,  0.7333,  0.0111},
     {-0.0545, -0.0614,  0.0128,   -0.0651, -0.1286,  1.2968},
@@ -43,12 +43,12 @@ float clip(float num)
 CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 {
     // These each stand for left blue, right blue, etc.
-    double lb = left_pixel.val[0];
-    double lg = left_pixel.val[1];
-    double lr = left_pixel.val[2];
-    double rb = right_pixel.val[0];
-    double rg = right_pixel.val[1];
-    double rr = right_pixel.val[2];
+    float lb = left_pixel.val[0];
+    float lg = left_pixel.val[1];
+    float lr = left_pixel.val[2];
+    float rb = right_pixel.val[0];
+    float rg = right_pixel.val[1];
+    float rr = right_pixel.val[2];
 
     CvScalar result = cvScalar(
         // Remember that OpenCV likes to use BGR

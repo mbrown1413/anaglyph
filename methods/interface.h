@@ -25,9 +25,9 @@ void method_init(void);
  * The use of CvScalar is a bit confusing.  All of the CvScalars have four
  * elements, but only 3 of them are used.  Also, OpenCV likes to use BGR
  * instead of RGB, like normal people.  So to clarify everything:
- * double left_blue  = left_pixel.val[0];
- * double left_green = left_pixel.val[1];
- * double left_red   = left_pixel.val[2];
+ * float left_blue  = left_pixel.val[0];
+ * float left_green = left_pixel.val[1];
+ * float left_red   = left_pixel.val[2];
  */
 CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel);
 

@@ -18,9 +18,9 @@
 
 #include "color_tools.h"
 
-double* working_memory;
+float* working_memory;
 
-void minimization_function(double *parameters, double *x, int m, int n, void *data) {
+void minimization_function(float *parameters, float *x, int m, int n, void *data) {
     x[LEFT_LSTAR] = LCD_Lstar(&parameters[0]);
     x[LEFT_ASTAR] = LCD_Astar(&parameters[0]);
     x[LEFT_BSTAR] = LCD_Bstar(&parameters[0]);
@@ -29,7 +29,7 @@ void minimization_function(double *parameters, double *x, int m, int n, void *da
     x[RIGHT_BSTAR] = LCD_Bstar(&parameters[0]);
 }
 
-void jacobian(double *p, double *jac, int m, int n, void *data) {
+void jacobian(float *p, float *jac, int m, int n, void *data) {
 
 }
 
@@ -38,7 +38,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
     // These are the parameters that are varied
     // They are the starting values and they are modified by levmar until the
     // function is minimized.
-    double parameters[3] = {
+    float parameters[3] = {
         left_pixel.val[2], //R
         left_pixel.val[1], //G
         left_pixel.val[0]  //B
@@ -46,17 +46,17 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 
     // Convert left_pixel and right_pixel to CIELab
     // These are the target values for the minimization
-    double left_pixel_rgb[3] = {
+    float left_pixel_rgb[3] = {
         left_pixel.val[2], //R
         left_pixel.val[1], //G
         left_pixel.val[0]  //B
     };
-    double right_pixel_rgb[3] = {
+    float right_pixel_rgb[3] = {
         right_pixel.val[2], //R
         right_pixel.val[1], //G
         right_pixel.val[0]  //B
     };
-    double target[6] = {
+    float target[6] = {
         CLstarLeft(left_pixel_rgb),
         CAstarLeft(left_pixel_rgb),
         CBstarLeft(left_pixel_rgb),
@@ -65,7 +65,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         CBstarRight(right_pixel_rgb)
     };
 
-    int number_of_iterations = dlevmar_dif(
+    int number_of_iterations = slevmar_dif(
         minimization_function,
         parameters,
         target,
@@ -89,12 +89,12 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 
 void method_init() {
 
-    working_memory = (double*) malloc((LM_DIF_WORKSZ(3, 6))*sizeof(double));
+    working_memory = (float*) malloc((LM_DIF_WORKSZ(3, 6))*sizeof(float));
 
     // Verify the Jacobian
     /*
-    double err[16];
-    double p[3] = {127, 127, 127};
+    float err[16];
+    float p[3] = {127, 127, 127};
     dlevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err); 
     for(i=0; i<n; ++i) printf("Gradient %d, Error %g\n", i, err[i]);
     */
