@@ -21,12 +21,12 @@
 float* working_memory;
 
 void minimization_function(float *parameters, float *x, int m, int n, void *data) {
-    x[LEFT_LSTAR] = LCD_Lstar(&parameters[0]);
-    x[LEFT_ASTAR] = LCD_Astar(&parameters[0]);
-    x[LEFT_BSTAR] = LCD_Bstar(&parameters[0]);
-    x[RIGHT_LSTAR] = LCD_Lstar(&parameters[0]);
-    x[RIGHT_ASTAR] = LCD_Astar(&parameters[0]);
-    x[RIGHT_BSTAR] = LCD_Bstar(&parameters[0]);
+    x[LEFT_LSTAR] = CLstarLeft(&parameters[0]);
+    x[LEFT_ASTAR] = CAstarLeft(&parameters[0]);
+    x[LEFT_BSTAR] = CBstarLeft(&parameters[0]);
+    x[RIGHT_LSTAR] = CLstarRight(&parameters[0]);
+    x[RIGHT_ASTAR] = CAstarRight(&parameters[0]);
+    x[RIGHT_BSTAR] = CBstarRight(&parameters[0]);
 }
 
 void jacobian(float *p, float *jac, int m, int n, void *data) {
@@ -57,12 +57,12 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         right_pixel.val[0]  //B
     };
     float target[6] = {
-        CLstarLeft(left_pixel_rgb),
-        CAstarLeft(left_pixel_rgb),
-        CBstarLeft(left_pixel_rgb),
-        CLstarRight(right_pixel_rgb),
-        CAstarRight(right_pixel_rgb),
-        CBstarRight(right_pixel_rgb)
+        Lstarleft(left_pixel_rgb),
+        Astarleft(left_pixel_rgb),
+        Bstarleft(left_pixel_rgb),
+        Lstarright(right_pixel_rgb),
+        Astarright(right_pixel_rgb),
+        Bstarright(right_pixel_rgb)
     };
 
     int number_of_iterations = slevmar_dif(
@@ -90,6 +90,8 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 void method_init() {
 
     working_memory = (float*) malloc((LM_DIF_WORKSZ(3, 6))*sizeof(float));
+    
+    CIEmatricesLandR();
 
     // Verify the Jacobian
     /*
