@@ -114,6 +114,30 @@ int main(int argc, char** argv)
 
         CvCapture* left_eye_capture = open_video(left_eye_string);
         CvCapture* right_eye_capture = open_video(right_eye_string);
+
+        // Check dimmensions
+        int left_width = cvGetCaptureProperty(left_eye_capture,
+            CV_CAP_PROP_FRAME_WIDTH);
+        int left_height = cvGetCaptureProperty(left_eye_capture,
+            CV_CAP_PROP_FRAME_HEIGHT);
+        int right_width = cvGetCaptureProperty(right_eye_capture,
+            CV_CAP_PROP_FRAME_WIDTH);
+        int right_height = cvGetCaptureProperty(right_eye_capture,
+            CV_CAP_PROP_FRAME_HEIGHT);
+        if (left_width != right_width || left_height != right_height) {
+            printf("\nError: Right and left eye image must have the same dimmensions!\n\n");
+        }
+
+        CvVideoWriter* output_writer;
+        if (output_file != NULL) {
+            output_writer = cvCreateVideoWriter(output_file,
+                CV_FOURCC('M','J','P','G'), // Codec
+                20, // fps
+                cvSize(left_width, left_height),
+                1 // is_color
+            );
+        }
+
         if (!left_eye_capture) {
             printf("Could not open left eye video: %s\n", left_eye_string);
             exit(1);
@@ -128,14 +152,14 @@ int main(int argc, char** argv)
         while (true) {
             IplImage* left_eye = cvQueryFrame(left_eye_capture);
             IplImage* right_eye = cvQueryFrame(right_eye_capture);
+            if (!left_eye || !right_eye) { break; }
             printf("Calculating Frame: %d\n", (int)cvGetCaptureProperty(left_eye_capture, CV_CAP_PROP_POS_FRAMES)+1);
             IplImage* stereo = combine_stereo(left_eye, right_eye, 0);
 
             if (output_file == NULL) {
                 cvShowImage("Stereo", stereo);
             } else {
-                printf("AVI Writing not yet implemented!\n");
-                exit(1);
+                cvWriteFrame(output_writer, stereo);
             }
 
             int key = cvWaitKey(10);
@@ -149,6 +173,9 @@ int main(int argc, char** argv)
 
         }
 
+        if (output_file != NULL) {
+            cvReleaseVideoWriter(&output_writer);
+        }
         method_free();
 
     } else {
@@ -168,7 +195,6 @@ int main(int argc, char** argv)
             left_eye->height != right_eye->height)
         {
             printf("\nError: Right and left eye image must have the same dimmensions!\n\n");
-            usage_message(argv[0]);
         }
 
         method_init();
