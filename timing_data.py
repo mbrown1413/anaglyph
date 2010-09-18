@@ -7,7 +7,6 @@ images = [ # ("Pretty name", "left eye image", "right eye image")
 
 from subprocess import Popen, PIPE
 
-print "Make sure main.c is set to exit after generating the first image."
 for image in images:
     print "\n%s:" % image[0]
     for i in xrange(NUMBER_OF_RUNS):
@@ -16,6 +15,7 @@ for image in images:
             "-f", '%e', # output total "real" time
             "./bin/mcallister",
             image[1], image[2],
+            "-o", "output.png",
         ]
         p = Popen(command, stdout=PIPE)
         p.wait()
