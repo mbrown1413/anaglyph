@@ -7,7 +7,7 @@ LEVMAR_DIRECTORY = ./
 # Comment this out if levmar was not compiled with lapack
 LEVMAR_FLAGS = -llapack -u MAIN__
 
-# Directory for OpenCV include files.
-# When using MacPorts, in my experience, the include files for OpenCV are
-# located at "/opt/local/include/opencv".
-OPENCV_INCLUDE_DIRECTORY=/usr/local/include/opencv
+# -I and -L flags for OpenCV include and lib directory, if needed.
+OPENCV_EXTRA_FLAGS=$(shell pkg-config --libs-only-L --cflags opencv)
+# Use this instead for macport installations 
+#OPENCV_EXTRA_FLAGS=-I/opt/local/include/opencv -L/opt/local/lib
