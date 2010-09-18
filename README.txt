@@ -43,20 +43,12 @@ http://opencv.willowgarage.com/wiki/Mac_OS_X_OpenCV_Port
 ---------
 Compiling
 ---------
-To compile, type the "make" command inside the root of the repository.  This
-reads the makefile located in the file "makefile" to read the compiler commands
-and run them.  The executables generated, one for each method, will be placed
+First, copy "settings.mk.default" to "settings.mk".  Next, open "settings.mk"
+and read through the options.  You will need to change some of these before
+compiling.
+
+To compile, type the "make" command inside the root of the repository.  The executables generated, one for each method, will be placed
 in the bin/ directory.
-
-You may have to change the OPENCV_FLAGS variable inside "makefile" if your
-compiler can't find the OpenCV header files or the OpenCV object files.  The -I
-flag specifies where to look for include files.  The -L flag specifies
-where to look for object files.
-
-Mac Specifics
-`````````````
-When using MacPorts, in my experience, the include files for OpenCV are located at
-"/opt/local/include" and the object files are located at "/opt/local/lib".
 
 -------
 Running

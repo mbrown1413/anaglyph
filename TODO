@@ -3,6 +3,7 @@ The .o files are deleted at the end of the make process.  Make has to recompile 
 Compiling process:
     - Write an SConstruct so people can compile with either Make or Scons
     - Maybe make levmar optional
+    - Commands which only do compiling are given linking flags.  This generates warnings that may look like important errors to some people.
 
 For McAllister method:
     - Write Jacobian and give it to levmar

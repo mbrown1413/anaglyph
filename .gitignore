@@ -3,3 +3,4 @@ bin/*
 images/*
 methods/bin/*
 *.swp
+settings.mk.default
