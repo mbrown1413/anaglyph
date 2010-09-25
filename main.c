@@ -12,7 +12,7 @@
 /**
  * Combines a left and right eye image into an anaglyph.
  */
-IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye, int offset_x)
+IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye)
 {
     IplImage* stereo = cvCreateImage(cvSize(left_eye->width, left_eye->height), IPL_DEPTH_8U, 3);
 
@@ -20,13 +20,7 @@ IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye, int offset_x)
     {
         for (int y=0; y<stereo->height; y++)
         {
-            //TODO: Optimize pixel setting/getting
-            CvScalar left_pixel;
-            if (x+offset_x < stereo->width-1 && x+offset_x>=0) {
-                left_pixel = cvGet2D(left_eye, y, x+offset_x);
-            } else {
-                left_pixel = cvScalar(0,0,0,0);
-            }
+            CvScalar left_pixel = cvGet2D(left_eye, y, x);
             CvScalar right_pixel = cvGet2D(right_eye, y, x);
             CvScalar stereo_pixel = method_combine_pixels(
                 left_pixel, right_pixel
@@ -40,10 +34,15 @@ IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye, int offset_x)
 
 void usage_message(char* program_name) {
         printf("Usage: %s [options] <left-eye> <right-eye>\n", program_name);
-        printf("The left-eye and right-eye arguments as of now, must be image files.  In the future, ffmpeg, avi and webcam support will be added.\n");
+        printf("The left-eye and right-eye arguments must be image files, avi files, or numbers\n");
+        printf("representing a camera index.\n");
         printf("\n");
-        printf("    -o <file_name>         Specify output file.  If none is specified, output\n                           will be shown in a window.\n");
-        printf("    -v                     Indicates that the left and right eye image files \n                           given are video files.\n");
+        printf("    --output <file_name>\n");
+        printf("    -o <file_name>         Specify output file.  If none is specified, output\n");
+        printf("                           will be shown in a window.\n");
+        printf("    --video\n");
+        printf("    -v                     Indicates that the left and right eye image files \n");
+        printf("                           given are video files, or camera indexes.\n");
         exit(1);
 }
 
@@ -85,7 +84,8 @@ int main(int argc, char** argv)
             usage_message(argv[0]);
 
         // Video
-        } else if (strcmp(argv[i], "-v") == 0) {
+        } else if (strcmp(argv[i], "-v") == 0 ||
+                   strcmp(argv[i], "--video") == 0) {
             files_are_video = true;
 
         // Left or right eye image
@@ -126,6 +126,7 @@ int main(int argc, char** argv)
             CV_CAP_PROP_FRAME_HEIGHT);
         if (left_width != right_width || left_height != right_height) {
             printf("\nError: Right and left eye image must have the same dimmensions!\n\n");
+            exit(1);
         }
 
         CvVideoWriter* output_writer;
@@ -149,12 +150,13 @@ int main(int argc, char** argv)
 
         method_init();
 
+        bool breakflag = false;
         while (true) {
             IplImage* left_eye = cvQueryFrame(left_eye_capture);
             IplImage* right_eye = cvQueryFrame(right_eye_capture);
             if (!left_eye || !right_eye) { break; }
             printf("Calculating Frame: %d\n", (int)cvGetCaptureProperty(left_eye_capture, CV_CAP_PROP_POS_FRAMES)+1);
-            IplImage* stereo = combine_stereo(left_eye, right_eye, 0);
+            IplImage* stereo = combine_stereo(left_eye, right_eye);
 
             if (output_file == NULL) {
                 cvShowImage("Stereo", stereo);
@@ -164,6 +166,7 @@ int main(int argc, char** argv)
 
             int key = cvWaitKey(10);
             if ( (char) key == 27) { // Esc to exit
+                breakflag = true;
                 break;
             }
             switch( (char) key) {
@@ -177,6 +180,9 @@ int main(int argc, char** argv)
             cvReleaseVideoWriter(&output_writer);
         }
         method_free();
+        if (output_file == NULL && !breakflag) {
+            cvWaitKey(-1);
+        }
 
     } else {
 
@@ -199,7 +205,7 @@ int main(int argc, char** argv)
 
         method_init();
 
-        IplImage* stereo = combine_stereo(left_eye, right_eye, 0);
+        IplImage* stereo = combine_stereo(left_eye, right_eye);
         if (output_file == NULL) {
             cvShowImage("Stereo", stereo);
         } else {
@@ -209,18 +215,18 @@ int main(int argc, char** argv)
         cvFree(&stereo);
         method_free();
 
-    }
-
-    if (output_file == NULL) {
-        while (1) {
-            int key = cvWaitKey(-1);
-            if ( (char) key == 27) { // Esc to exit
-                break;
-            }
-            switch( (char) key) {
-                // Keyboard Commands
+        if (output_file == NULL) {
+            while (1) {
+                int key = cvWaitKey(-1);
+                if ( (char) key == 27) { // Esc to exit
+                    break;
+                }
+                switch( (char) key) {
+                    // Keyboard Commands
+                }
             }
         }
+
     }
 
     return 0;
