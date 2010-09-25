@@ -9,42 +9,30 @@
 
 #include "methods/interface.h" // All method_* are defined here
 
-#ifdef NO_CLIPPING
-    #define CLIP(v) (v)
-#else
-    #ifdef HIGHLIGHT_CLIPPING
-        // Highlighted clipping will make the clipped channel 255 off from what
-        // it should be, making it easy to see.
-        #define CLIP(v) ((v)>255 ? 0 : ((v)<0 ? 255 : v ))
-    #else
-        #define CLIP(v) ((v)>255 ? 255 : ((v)<0 ? 0 : v ))
-    #endif
-#endif
-
 /**
  * Combines a left and right eye image into an anaglyph.
  */
-IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye)
+IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye, int offset_x)
 {
     IplImage* stereo = cvCreateImage(cvSize(left_eye->width, left_eye->height), IPL_DEPTH_8U, 3);
 
-    uchar* ptr_left = (uchar*) left_eye->imageData;
-    uchar* ptr_right = (uchar*) right_eye->imageData;
-    uchar* ptr_stereo = (uchar*) stereo->imageData;
-    for (int i=left_eye->width*left_eye->height-1; i>=0; i--) {
-
-        CvScalar stereo_pixel = method_combine_pixels(
-            cvScalar(ptr_left[0], ptr_left[1], ptr_left[2], 0),
-            cvScalar(ptr_right[0], ptr_right[1], ptr_right[2], 0)
-        );
-        ptr_stereo[0] = (uchar) CLIP(stereo_pixel.val[0]);
-        ptr_stereo[1] = (uchar) CLIP(stereo_pixel.val[1]);
-        ptr_stereo[2] = (uchar) CLIP(stereo_pixel.val[2]);
-
-        ptr_left += 3;
-        ptr_right += 3;
-        ptr_stereo += 3;
-
+    for (int x=0; x<stereo->width; x++)
+    {
+        for (int y=0; y<stereo->height; y++)
+        {
+            //TODO: Optimize pixel setting/getting
+            CvScalar left_pixel;
+            if (x+offset_x < stereo->width-1 && x+offset_x>=0) {
+                left_pixel = cvGet2D(left_eye, y, x+offset_x);
+            } else {
+                left_pixel = cvScalar(0,0,0,0);
+            }
+            CvScalar right_pixel = cvGet2D(right_eye, y, x);
+            CvScalar stereo_pixel = method_combine_pixels(
+                left_pixel, right_pixel
+            );
+            cvSet2D(stereo, y, x, stereo_pixel);
+        }
     }
 
     return stereo;
@@ -166,7 +154,7 @@ int main(int argc, char** argv)
             IplImage* right_eye = cvQueryFrame(right_eye_capture);
             if (!left_eye || !right_eye) { break; }
             printf("Calculating Frame: %d\n", (int)cvGetCaptureProperty(left_eye_capture, CV_CAP_PROP_POS_FRAMES)+1);
-            IplImage* stereo = combine_stereo(left_eye, right_eye);
+            IplImage* stereo = combine_stereo(left_eye, right_eye, 0);
 
             if (output_file == NULL) {
                 cvShowImage("Stereo", stereo);
@@ -211,7 +199,7 @@ int main(int argc, char** argv)
 
         method_init();
 
-        IplImage* stereo = combine_stereo(left_eye, right_eye);
+        IplImage* stereo = combine_stereo(left_eye, right_eye, 0);
         if (output_file == NULL) {
             cvShowImage("Stereo", stereo);
         } else {
