@@ -11,8 +11,6 @@
 SHELL = /bin/sh
 CC=gcc
 
-# Handle settings.mk
-$(shell cp -u settings.mk.default settings.mk)
 include settings.mk
 
 LEVMAR_CC_FLAGS=-I$(LEVMAR_DIRECTORY)
