@@ -19,6 +19,15 @@
 #include "color_tools.h"
 
 float* working_memory;
+//double opts[LM_OPTS_SZ];
+
+unsigned long total_combines = 0;
+double total_initial_gradient = 0;
+unsigned long total_iterations = 0;
+unsigned long terminate_reasons[8] = {0,0,0,0,0,0,0,0};
+unsigned long function_evaluations = 0;
+unsigned long jacobian_evaluations = 0;
+unsigned long systems_solved = 0;
 
 void minimization_function(float *parameters, float *x, int m, int n, void *data) {
     x[LEFT_LSTAR] = CLstarLeft(&parameters[0]);
@@ -65,6 +74,11 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         Bstarright(right_pixel_rgb)
     };
 
+    #ifdef MCALLISTER_STATISTICS
+        float info[LM_INFO_SZ];
+    #else
+        float* info = NULL;
+    #endif
     int number_of_iterations = slevmar_dif(
         minimization_function,
         parameters,
@@ -73,12 +87,23 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         6, // length of target
         MAX_ITERATIONS,
         NULL, //TODO: opts
-        NULL, //TODO: info
+        info,
         working_memory,
         NULL, // Covariance matrix
         NULL  // Extra data not needed
     );
-    //printf("Iterations: %d\n", number_of_iterations);
+
+    // Record info
+    #ifdef MCALLISTER_STATISTICS
+        total_combines++;
+        total_initial_gradient += info[0];
+        total_iterations += info[5];
+        terminate_reasons[ (int)info[6] ] += 1;
+        function_evaluations += info[7];
+        jacobian_evaluations += info[8];
+        systems_solved += info[9];
+    #endif
+
     return cvScalar(
         parameters[2], //B
         parameters[1], //G
@@ -103,5 +128,25 @@ void method_init() {
 
 }
 void method_free() {
+
+    // Print recorded data
+    #ifdef MCALLISTER_STATISTICS
+        printf("\n");
+        printf("Total pixel combines: %ld\n", total_combines);
+        printf("Average initial gradient: %f\n", total_initial_gradient/total_combines);
+        printf("Average iterations: %f\n", ((double)total_iterations)/total_combines);
+        printf("Reasons for terminating:\n");
+        printf("    1 - stopped by small gradient J^T e                                      %ld\n", terminate_reasons[1]);
+        printf("    2 - stopped by small Dp                                                  %ld\n", terminate_reasons[2]);
+        printf("    3 - stopped by itmax                                                     %ld\n", terminate_reasons[3]);
+        printf("    4 - singular matrix. Restart from current p with increased \\mu           %ld\n", terminate_reasons[4]);
+        printf("    5 - no further error reduction is possible. Restart with increased mu    %ld\n", terminate_reasons[5]);
+        printf("    6 - stopped by small ||e||_2                                             %ld\n", terminate_reasons[6]);
+        printf("    7 - stopped by invalid (i.e. NaN or Inf) \"func\" values; a user error     %ld\n", terminate_reasons[7]);
+        printf("Average function evaluations: %f\n", ((double)function_evaluations)/total_combines);
+        printf("Average jacobian evaluations: %f\n", ((double)jacobian_evaluations)/total_combines);
+        printf("Average systems solved: %f\n", ((double)systems_solved)/total_combines);
+    #endif
+
     free(working_memory);
 }

@@ -33,7 +33,8 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel);
 
 /**
  * method_free
- * Anything that needs to be done all calculations are done, such as feeing memory.
+ * Anything that needs to be done all calculations are done, such as feeing
+ * memory.
  *
  * This is called only once, after all calculations are done.
  *
