@@ -2,8 +2,6 @@
  *
  */
 
-#define MAX_ITERATIONS 50
-
 // These are the six elements of "target" and "x"
 #define LEFT_LSTAR 0
 #define LEFT_ASTAR 1
@@ -13,13 +11,23 @@
 #define RIGHT_BSTAR 5
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <cv.h>
 #include <levmar.h>
 
 #include "color_tools.h"
 
+// Options
+#define MAX_ITERATIONS 50
+float opts[5] = {
+    LM_INIT_MU, // Scale factor for initial \mu
+    1E-15, // Stopping threshold for ||J^t e||_inf
+    1E-3, // Stopping threshold for ||Dp||_2
+    5, // Stopping threshold for ||e||_2
+    LM_DIFF_DELTA // Step difference when using difference jacobian approx
+};
+
 float* working_memory;
-//double opts[LM_OPTS_SZ];
 
 unsigned long total_combines = 0;
 double total_initial_gradient = 0;
@@ -47,11 +55,10 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
     // These are the parameters that are varied
     // They are the starting values and they are modified by levmar until the
     // function is minimized.
-    float parameters[3] = {
-        left_pixel.val[2], //R
-        left_pixel.val[1], //G
-        left_pixel.val[0]  //B
-    };
+    float parameters[3];
+    parameters[0] = (left_pixel.val[2] + right_pixel.val[2])/2; //R
+    parameters[1] = (left_pixel.val[1] + right_pixel.val[1])/2; //G
+    parameters[2] = (left_pixel.val[0] + right_pixel.val[0])/2; //B
 
     // Convert left_pixel and right_pixel to CIELab
     // These are the target values for the minimization
@@ -86,7 +93,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         3, // length of parameters
         6, // length of target
         MAX_ITERATIONS,
-        NULL, //TODO: opts
+        opts,
         info,
         working_memory,
         NULL, // Covariance matrix
