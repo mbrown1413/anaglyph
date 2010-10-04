@@ -119,11 +119,11 @@ void method_init() {
     CIEmatricesLandR();
 
     // Verify the Jacobian
-    /*
-    float err[16];
-    float p[3] = {127, 127, 127};
-    dlevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err); 
-    for(i=0; i<n; ++i) printf("Gradient %d, Error %g\n", i, err[i]);
+    /* 
+    float err[18];
+    float p[3] = {200, 100, 10};
+    slevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err); 
+    for(int i=0; i<18; ++i) printf("Gradient %d, Error %g\n", i, err[i]);
     */
 
 }
