@@ -2,8 +2,6 @@
  *
  */
 
-#define MAX_ITERATIONS 50
-
 // These are the six elements of "target" and "x"
 #define LEFT_LSTAR 0
 #define LEFT_ASTAR 1
@@ -19,8 +17,17 @@
 
 #include "color_tools.h"
 
+// Options
+#define MAX_ITERATIONS 50
+float opts[5] = {
+    LM_INIT_MU, // Scale factor for initial \mu
+    1E-15, // Stopping threshold for ||J^t e||_inf
+    1E-3, // Stopping threshold for ||Dp||_2
+    5, // Stopping threshold for ||e||_2
+    LM_DIFF_DELTA // Step difference when using difference jacobian approx
+};
+
 float* working_memory;
-//double opts[LM_OPTS_SZ];
 
 unsigned long total_combines = 0;
 double total_initial_gradient = 0;
@@ -86,7 +93,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         3, // length of parameters
         6, // length of target
         MAX_ITERATIONS,
-        NULL, //TODO: opts
+        opts,
         info,
         working_memory,
         NULL, // Covariance matrix
