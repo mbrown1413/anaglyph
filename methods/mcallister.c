@@ -13,6 +13,7 @@
 #define RIGHT_BSTAR 5
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <cv.h>
 #include <levmar.h>
 
@@ -47,11 +48,10 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
     // These are the parameters that are varied
     // They are the starting values and they are modified by levmar until the
     // function is minimized.
-    float parameters[3] = {
-        left_pixel.val[2], //R
-        left_pixel.val[1], //G
-        left_pixel.val[0]  //B
-    };
+    float parameters[3];
+    parameters[0] = (left_pixel.val[2] + right_pixel.val[2])/2; //R
+    parameters[1] = (left_pixel.val[1] + right_pixel.val[1])/2; //G
+    parameters[2] = (left_pixel.val[0] + right_pixel.val[0])/2; //B
 
     // Convert left_pixel and right_pixel to CIELab
     // These are the target values for the minimization
