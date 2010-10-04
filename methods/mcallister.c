@@ -39,6 +39,136 @@ void minimization_function(float *parameters, float *x, int m, int n, void *data
 }
 
 void jacobian(float *p, float *jac, int m, int n, void *data) {
+    register float r = p[0];
+    register float g = p[1];
+    register float b = p[2];
+
+    //Derivatives of LstarLeft
+    float rgb_sum = (0.0018*b + 0.0118*g + 0.0876*r);
+    if (rgb_sum/100 > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[0] = 116 * 0.00629095/cube_root_squared;
+        jac[1] = 116 * 0.000847411/cube_root_squared;
+        jac[2] = 116 * 0.000129266/cube_root_squared;
+    } else {
+        jac[0] = 116 * 0.682141/100;
+        jac[1] = 116 * 0.0918866/100;
+        jac[2] = 116 * 0.0140166/100;
+    }
+    
+    //Derivatives of LstarRight
+    rgb_sum = (0.0777*b +0.3088*g + 0.0176*r);
+    if (rgb_sum/100 > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[9] = 116 * 0.00126394/cube_root_squared;
+        jac[10] = 116 * 0.0221763/cube_root_squared;
+        jac[11] = 116 * 0.005579/cube_root_squared;
+    } else {
+        jac[9] = 116 * 0.137051/100;
+        jac[10] = 116 * 2.40463/100;
+        jac[11] = 116 * 0.60505/100;
+    }
+
+    //Derivates of AstarLeft
+    rgb_sum = 0.0018*b + 0.0118*g + 0.0876*r;
+    if (rgb_sum/100 > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[3] = -0.00629095/cube_root_squared;
+        jac[4] = -0.000847411/cube_root_squared;
+        jac[5] = -0.000129266/cube_root_squared;
+    } else {
+        jac[3] = -0.682141/100;
+        jac[4] = -0.0918866/100;
+        jac[5] = -0.0140166/100;
+    }
+
+    rgb_sum = 0.0048*b + 0.0179*g + 0.184*r;
+    if (0.00899734*rgb_sum > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[3] = 500 * (jac[3] + 0.00899734 * 1.41782 / cube_root_squared); 
+        jac[4] = 500 * (jac[4] + 0.00899734 * 1.137929/cube_root_squared);
+        jac[5] = 500 * (jac[5] + 0.00899734 * 0.117895 / cube_root_squared);
+    } else {
+        jac[3] = 500 * (jac[3] + 1.43281 / 111.144); 
+        jac[4] = 500 * (jac[4] + 0.139387 / 111.144);
+        jac[5] = 500 * (jac[5] + 0.0373776 / 111.144);
+    }
+
+    //Derivatives of AstarRight
+    rgb_sum = 0.0777*b + 0.3088*g + 0.0176*r;
+    if (rgb_sum/100 > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[12] = -0.00126394/cube_root_squared;
+        jac[13] = -0.0221763/cube_root_squared;
+        jac[14] = -0.00557999/cube_root_squared;
+    } else {
+        jac[12] = -0.137051/100;
+        jac[13] = -2.40463/100;
+        jac[14] = -0.60505/100;
+    }
+
+    rgb_sum = 0.1171*b + 0.1092*g + 0.0153*r;
+    if (0.00899734*rgb_sum > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[12] = 500 * (jac[12] + 0.00899734 * 0.117895 / cube_root_squared); 
+        jac[13] = 500 * (jac[13] + 0.00899734 * 0.841444 / cube_root_squared);
+        jac[14] = 500 * (jac[14] + 0.00899734 * 0.902318 / cube_root_squared);
+    } else {
+        jac[12] = 500 * (jac[12] + 0.119141 / 111.144); 
+        jac[13] = 500 * (jac[13] + 0.139387 / 111.144);
+        jac[14] = 500 * (jac[14] + 0.0373776 / 111.144);
+    }
+    
+    //Derivatives for BstarLeft
+    rgb_sum = 0.0159*b + 0.0012*g + 0.0005*r;
+    if (0.0284083*rgb_sum > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[6] = -0.00179013*0.0284083/cube_root_squared;
+        jac[7] = -0.00429632*0.0284083/cube_root_squared;
+        jac[8] = -0.00179013*0.0284083/cube_root_squared;
+    } else {
+        jac[6] = -0.0038935/35.201;
+        jac[7] = -0.0918866/35.201;
+        jac[8] = -0.123813/35.201;
+    }
+
+    rgb_sum = 0.0018*b + 0.0118*g + 0.0876*r;
+    if (rgb_sum/100 > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[6] = 200*(jac[6] + 0.00629095/cube_root_squared);
+        jac[7] = 200*(jac[7] + 0.000847411/cube_root_squared);
+        jac[8] = 200*(jac[8] + 0.000129266/cube_root_squared);
+    } else {
+        jac[6] = 200*(jac[6] + 0.682141/100);
+        jac[7] = 200*(jac[7] + 0.0918866/100);
+        jac[8] = 200*(jac[8] + 0.0140166/100);
+    }
+
+    //Derivatives for BstarRight
+    rgb_sum = 0.6546*b + 0.1016*g + 0.0201*r;
+    if (0.0284083*rgb_sum > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[15] = -0.0719634*0.0284083/cube_root_squared;
+        jac[16] = -0.363755*0.0284083/cube_root_squared;
+        jac[17] = -2.34364*0.0284083/cube_root_squared;
+    } else {
+        jac[15] = -0.156519/35.201;
+        jac[16] = -0.791159/35.201;
+        jac[17] = -5.09737/35.201;
+    }
+
+    rgb_sum = 0.0018*b + 0.0118*g + 0.0876*r;
+    if (rgb_sum/100 > 0.008856) {
+        float cube_root_squared = pow(rgb_sum,2.0/3);
+        jac[15] = 200*(jac[15] + 0.00126394/cube_root_squared);
+        jac[16] = 200*(jac[16] + 0.0221763/cube_root_squared);
+        jac[17] = 200*(jac[17] + 0.00557999/cube_root_squared);
+    } else {
+        jac[15] = 200*(jac[15] + 0.137051/100);
+        jac[16] = 200*(jac[16] + 2.40463/100);
+        jac[17] = 200*(jac[17] + 0.60505/100);
+    }
+
 
 }
 
@@ -79,8 +209,9 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
     #else
         float* info = NULL;
     #endif
-    int number_of_iterations = slevmar_dif(
+    int number_of_iterations = slevmar_der(
         minimization_function,
+        jacobian,
         parameters,
         target,
         3, // length of parameters
@@ -119,12 +250,12 @@ void method_init() {
     CIEmatricesLandR();
 
     // Verify the Jacobian
-    /*
+    
     float err[16];
     float p[3] = {127, 127, 127};
-    dlevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err); 
-    for(i=0; i<n; ++i) printf("Gradient %d, Error %g\n", i, err[i]);
-    */
+    slevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err); 
+    for(int i=0; i<18; ++i) printf("Gradient %d, Error %g\n", i, err[i]);
+    
 
 }
 void method_free() {
