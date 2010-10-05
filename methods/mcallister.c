@@ -20,10 +20,10 @@
 // Options
 #define MAX_ITERATIONS 50
 float opts[5] = {
-    LM_INIT_MU, // Scale factor for initial \mu
-    1E-15, // Stopping threshold for ||J^t e||_inf
-    1E-3, // Stopping threshold for ||Dp||_2
-    5, // Stopping threshold for ||e||_2
+    0.01, // Scale factor for initial \mu
+    0.1, // Stopping threshold for ||J^t e||_inf
+    1E-2, // Stopping threshold for ||Dp||_2
+    10, // Stopping threshold for ||e||_2
     LM_DIFF_DELTA // Step difference when using difference jacobian approx
 };
 
@@ -38,12 +38,17 @@ unsigned long jacobian_evaluations = 0;
 unsigned long systems_solved = 0;
 
 void minimization_function(float *parameters, float *x, int m, int n, void *data) {
-    x[LEFT_LSTAR] = CLstarLeft(&parameters[0]);
-    x[LEFT_ASTAR] = CAstarLeft(&parameters[0]);
-    x[LEFT_BSTAR] = CBstarLeft(&parameters[0]);
-    x[RIGHT_LSTAR] = CLstarRight(&parameters[0]);
-    x[RIGHT_ASTAR] = CAstarRight(&parameters[0]);
-    x[RIGHT_BSTAR] = CBstarRight(&parameters[0]);
+    float lab[3];
+
+    rgb_to_lab_through_left_filter(parameters, lab);
+    x[LEFT_LSTAR] = lab[0];
+    x[LEFT_ASTAR] = lab[1];
+    x[LEFT_BSTAR] = lab[2];
+
+    rgb_to_lab_through_right_filter(parameters, lab);
+    x[RIGHT_LSTAR] = lab[0];
+    x[RIGHT_ASTAR] = lab[1];
+    x[RIGHT_BSTAR] = lab[2];
 }
 
 void jacobian(float *p, float *jac, int m, int n, void *data) {
@@ -72,13 +77,17 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         right_pixel.val[1], //G
         right_pixel.val[0]  //B
     };
+    float left_eye_lab[3];
+    float right_eye_lab[3];
+    rgb_to_lab_without_left_filter(left_pixel_rgb, left_eye_lab);
+    rgb_to_lab_without_right_filter(right_pixel_rgb, right_eye_lab);
     float target[6] = {
-        Lstarleft(left_pixel_rgb),
-        Astarleft(left_pixel_rgb),
-        Bstarleft(left_pixel_rgb),
-        Lstarright(right_pixel_rgb),
-        Astarright(right_pixel_rgb),
-        Bstarright(right_pixel_rgb)
+        left_eye_lab[0],
+        left_eye_lab[1],
+        left_eye_lab[2],
+        right_eye_lab[0],
+        right_eye_lab[1],
+        right_eye_lab[2]
     };
 
     #ifdef MCALLISTER_STATISTICS

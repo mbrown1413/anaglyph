@@ -9,10 +9,16 @@ float Lstar(float x, float y, float z);
 float Astar(float x, float y, float z);
 float Bstar(float x, float y, float z); 
 
+void xyz_to_lab(float xyz[], float lab[]);
+void rgb_to_lab_without_left_filter(float rgb[], float lab[]);
+void rgb_to_lab_without_right_filter(float rgb[], float lab[]);
+
 float LCD_Lstar(float rgb[3]);
 float LCD_Astar(float rgb[3]);
 float LCD_Bstar(float rgb[3]);
 
+void rgb_to_lab_through_left_filter(float rgb[], float lab[]);
+void rgb_to_lab_through_right_filter(float rgb[], float lab[]);
 float CLstarRight(float rgb[3]);
 float CAstarRight(float rgb[3]);
 float CBstarRight(float rgb[3]);
