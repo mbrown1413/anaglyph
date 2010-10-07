@@ -252,7 +252,7 @@ void method_init() {
     // Verify the Jacobian
     
     float err[16];
-    float p[3] = {127, 127, 127};
+    float p[3] = {250, 250, 250};
     slevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err); 
     for(int i=0; i<18; ++i) printf("Gradient %d, Error %g\n", i, err[i]);
     
