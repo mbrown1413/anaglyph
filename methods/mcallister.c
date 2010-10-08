@@ -130,7 +130,11 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
 
 void method_init() {
 
-    working_memory = (float*) malloc((LM_DIF_WORKSZ(3, 6))*sizeof(float));
+    #ifdef USE_OPENMP
+        working_memory = NULL;
+    #else
+        working_memory = (float*) malloc((LM_DIF_WORKSZ(3, 6))*sizeof(float));
+    #endif
     
     CIEmatricesLandR();
 
@@ -164,5 +168,7 @@ void method_free() {
         printf("Average systems solved: %f\n", ((double)systems_solved)/total_combines);
     #endif
 
-    free(working_memory);
+    #ifndef USE_OPENMP
+        free(working_memory);
+    #endif
 }

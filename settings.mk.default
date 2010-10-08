@@ -15,6 +15,11 @@ OPENCV_EXTRA_FLAGS=$(shell pkg-config --libs-only-L --cflags opencv)
 #OPENCV_EXTRA_FLAGS=-I/opt/local/include/opencv -L/opt/local/lib
 
 
+################## Multi-Threading ################## 
+# Comment this out if you don't want to use OpenMP Multithreading.
+USE_MULTITHREADING=1
+
+
 ################## Mcallister Method Options ################## 
 
 # Uncommenting this causes the Mcallister method to print out statistics about

@@ -16,13 +16,18 @@ IplImage* combine_stereo(IplImage* left_eye, IplImage* right_eye)
 {
     IplImage* stereo = cvCreateImage(cvSize(left_eye->width, left_eye->height), IPL_DEPTH_8U, 3);
 
-    for (int x=0; x<stereo->width; x++)
+    int x, y;
+    CvScalar left_pixel, right_pixel, stereo_pixel;
+    #ifdef USE_OPENMP
+        #pragma omp parallel for private(x, y, left_pixel, right_pixel, stereo_pixel)
+    #endif
+    for (y=0; y<stereo->height; y++)
     {
-        for (int y=0; y<stereo->height; y++)
+        for (x=0; x<stereo->width; x++)
         {
-            CvScalar left_pixel = cvGet2D(left_eye, y, x);
-            CvScalar right_pixel = cvGet2D(right_eye, y, x);
-            CvScalar stereo_pixel = method_combine_pixels(
+            left_pixel = cvGet2D(left_eye, y, x);
+            right_pixel = cvGet2D(right_eye, y, x);
+            stereo_pixel = method_combine_pixels(
                 left_pixel, right_pixel
             );
             cvSet2D(stereo, y, x, stereo_pixel);
