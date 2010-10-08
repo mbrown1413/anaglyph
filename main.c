@@ -209,7 +209,11 @@ int main(int argc, char** argv)
         if (output_file == NULL) {
             cvShowImage("Stereo", stereo);
         } else {
-            cvSaveImage(output_file, stereo, 0);
+            #if CV_MAJOR_VERSION>=2
+                cvSaveImage(output_file, stereo, 0);
+            #else
+                cvSaveImage(output_file, stereo);
+            #endif
         }
 
         cvFree(&stereo);
