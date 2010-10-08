@@ -147,10 +147,7 @@ void xyz_to_lab(float xyz[], float lab[]) {
 void rgb_to_lab_without_left_filter(float rgb[], float lab[]) {
     float cie_xyz[3];
     mult_matrices(CIEmatrixL, rgb, cie_xyz);
-    lab[0] = Lstar(cie_xyz[0], cie_xyz[1], cie_xyz[2]);
-    lab[1] = Astar(cie_xyz[0], cie_xyz[1], cie_xyz[2]);
-    lab[2] = Bstar(cie_xyz[0], cie_xyz[1], cie_xyz[2]);
-    //xyz_to_lab(cie_xyz, lab);
+    xyz_to_lab(cie_xyz, lab);
 }
 
 /**
@@ -162,10 +159,7 @@ void rgb_to_lab_without_left_filter(float rgb[], float lab[]) {
 void rgb_to_lab_without_right_filter(float rgb[], float lab[]) {
     float cie_xyz[3];
     mult_matrices(CIEmatrixR, rgb, cie_xyz);
-    lab[0] = Lstar(cie_xyz[0], cie_xyz[1], cie_xyz[2]);
-    lab[1] = Astar(cie_xyz[0], cie_xyz[1], cie_xyz[2]);
-    lab[2] = Bstar(cie_xyz[0], cie_xyz[1], cie_xyz[2]);
-    //xyz_to_lab(cie_xyz, lab);
+    xyz_to_lab(cie_xyz, lab);
 }
 
 /**
