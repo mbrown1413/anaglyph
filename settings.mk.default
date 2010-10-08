@@ -17,7 +17,7 @@ OPENCV_EXTRA_FLAGS=$(shell pkg-config --libs-only-L --cflags opencv)
 
 ################## Multi-Threading ################## 
 # Comment this out if you don't want to use OpenMP Multithreading.
-USE_MULTITHREADING=1
+MULTITHREADING_FLAGS= -fopenmp -DUSE_OPENMP
 
 
 ################## Mcallister Method Options ################## 
