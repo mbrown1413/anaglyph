@@ -25,18 +25,22 @@ methods/
 ------------
 Dependencies
 ------------
-* gcc
-* OpenCV
-* make
-* levmar
+Required:
+  * gcc
+  * OpenCV
+  * make
+  * levmar
 
-If you want to read video, you will need to compile OpenCV with FFMPEG support.
+Optional:
+  * OpenCV FFMpeg Support - If you want to read video.
+  * OpenMP - Used for multithreading.  To turn this off, see the multithreading
+             option in settings.mk
 
 Mac Specifics
 `````````````
-MacPorts can be used to install all of the above except for levmar.  FFMPEG support will be built
-into OpenCV as well.  For more details on Mac installation, read OpenCV's
-documentation:
+MacPorts can be used to install all of the above except for levmar.  Installing
+OpenCV will also install FFMpeg support and OpenMP.  For more details on Mac
+installation, read OpenCV's documentation:
 
 http://opencv.willowgarage.com/wiki/Mac_OS_X_OpenCV_Port
 
@@ -47,8 +51,9 @@ First, copy "settings.mk.default" to "settings.mk".  Next, open "settings.mk"
 and read through the options.  You will need to change some of these before
 compiling.
 
-To compile, type the "make" command inside the root of the repository.  The executables generated, one for each method, will be placed
-in the bin/ directory.
+To compile, type the "make" command inside the root of the repository.  The
+executables generated, one for each method, will be placed in the bin/
+directory.
 
 -------
 Running
