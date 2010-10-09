@@ -45,14 +45,20 @@ void usage_message(char* program_name) {
         printf("    --output <file_name>\n");
         printf("    -o <file_name>         Specify output file.  If none is specified, output\n");
         printf("                           will be shown in a window.\n");
+        printf("\n");
         printf("    --video\n");
         printf("    -v                     Indicates that the left and right eye image files \n");
         printf("                           given are video files, or camera indexes.\n");
+        printf("\n");
+        printf("    --frame <frame_num>\n");
+        printf("    -f <frame_num>         A zero-indexed frame to read from the video.  Only \n");
+        printf("                           this frame is read, and it is treated just as \n");
+        printf("                           though images had been given.  This option implies\n");
+        printf("                           --video.\n");
         exit(1);
 }
 
 CvCapture* open_video(char* str) {
-
         CvCapture* capture;
         if (strlen(str)==1 && isdigit(str[0]))
         {
@@ -61,7 +67,6 @@ CvCapture* open_video(char* str) {
             capture = cvCaptureFromFile(str);
         }
         return capture;
-
 }
 
 int main(int argc, char** argv)
@@ -71,6 +76,7 @@ int main(int argc, char** argv)
     char* right_eye_string = NULL;
     char* output_file = NULL;
     bool files_are_video = false;
+    int video_frame = -1;
     for (int i=1; i<argc; i++) {
 
         // Output Image
@@ -92,6 +98,17 @@ int main(int argc, char** argv)
         } else if (strcmp(argv[i], "-v") == 0 ||
                    strcmp(argv[i], "--video") == 0) {
             files_are_video = true;
+
+        // Frame number
+        } else if (strcmp(argv[i], "-f") == 0 ||
+                   strcmp(argv[i], "--frame") == 0)
+        {
+            if (i == argc-1) {
+                printf("\nError: Missing argument for -f\n\n");
+                usage_message(argv[0]);
+            }
+            video_frame = atoi(argv[i+1]);
+            i++; // Skip next arg
 
         // Left or right eye image
         } else {
@@ -115,7 +132,70 @@ int main(int argc, char** argv)
         cvNamedWindow("Stereo", CV_WINDOW_AUTOSIZE);
     }
 
-    if (files_are_video) {
+    if (!files_are_video || video_frame>-1) {
+        IplImage* left_eye;
+        IplImage* right_eye;
+
+        if (video_frame > -1) { // Reading one frame from video
+
+            CvCapture* left_eye_capture = open_video(left_eye_string);
+            CvCapture* right_eye_capture = open_video(right_eye_string);
+
+            cvSetCaptureProperty(left_eye_capture, CV_CAP_PROP_POS_FRAMES, video_frame);
+            cvSetCaptureProperty(right_eye_capture, CV_CAP_PROP_POS_FRAMES, video_frame);
+
+            left_eye = cvQueryFrame(left_eye_capture);
+            right_eye = cvQueryFrame(right_eye_capture);
+
+        } else { // Reading from image files
+            left_eye = cvLoadImage(left_eye_string, CV_LOAD_IMAGE_COLOR);
+            right_eye = cvLoadImage(right_eye_string, CV_LOAD_IMAGE_COLOR);
+        }
+
+        if (left_eye == NULL) {
+            printf("Could not open left eye image.\n");
+            exit(1);
+        }
+        if (right_eye == NULL) {
+            printf("Could not open right eye image.\n");
+            exit(1);
+        }
+
+        if (left_eye->width != right_eye->width ||
+            left_eye->height != right_eye->height)
+        {
+            printf("\nError: Right and left eye image must have the same dimmensions!\n\n");
+        }
+
+        method_init();
+
+        IplImage* stereo = combine_stereo(left_eye, right_eye);
+        if (output_file == NULL) {
+            cvShowImage("Stereo", stereo);
+        } else {
+            #if CV_MAJOR_VERSION>=2
+                cvSaveImage(output_file, stereo, 0);
+            #else
+                cvSaveImage(output_file, stereo);
+            #endif
+        }
+
+        cvFree(&stereo);
+        method_free();
+
+        if (output_file == NULL) {
+            while (1) {
+                int key = cvWaitKey(-1);
+                if ( (char) key == 27) { // Esc to exit
+                    break;
+                }
+                switch( (char) key) {
+                    // Keyboard Commands
+                }
+            }
+        }
+
+    } else { // Handle Video Files
 
         CvCapture* left_eye_capture = open_video(left_eye_string);
         CvCapture* right_eye_capture = open_video(right_eye_string);
@@ -187,53 +267,6 @@ int main(int argc, char** argv)
         method_free();
         if (output_file == NULL && !breakflag) {
             cvWaitKey(-1);
-        }
-
-    } else {
-
-        IplImage* left_eye = cvLoadImage(left_eye_string, CV_LOAD_IMAGE_COLOR);
-        IplImage* right_eye = cvLoadImage(right_eye_string, CV_LOAD_IMAGE_COLOR);
-
-        if (left_eye == NULL) {
-            printf("Could not open left eye image.\n");
-            exit(1);
-        }
-        if (right_eye == NULL) {
-            printf("Could not open right eye image.\n");
-            exit(1);
-        }
-        if (left_eye->width != right_eye->width ||
-            left_eye->height != right_eye->height)
-        {
-            printf("\nError: Right and left eye image must have the same dimmensions!\n\n");
-        }
-
-        method_init();
-
-        IplImage* stereo = combine_stereo(left_eye, right_eye);
-        if (output_file == NULL) {
-            cvShowImage("Stereo", stereo);
-        } else {
-            #if CV_MAJOR_VERSION>=2
-                cvSaveImage(output_file, stereo, 0);
-            #else
-                cvSaveImage(output_file, stereo);
-            #endif
-        }
-
-        cvFree(&stereo);
-        method_free();
-
-        if (output_file == NULL) {
-            while (1) {
-                int key = cvWaitKey(-1);
-                if ( (char) key == 27) { // Esc to exit
-                    break;
-                }
-                switch( (char) key) {
-                    // Keyboard Commands
-                }
-            }
         }
 
     }
