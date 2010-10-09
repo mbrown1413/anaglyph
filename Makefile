@@ -22,7 +22,7 @@ LEVMAR_LD_FLAGS=$(LEVMAR_FLAGS) \
     $(LEVMAR_DIRECTORY)/lmlec.o \
     $(LEVMAR_DIRECTORY)/lm.o \
     $(LEVMAR_DIRECTORY)/misc.o
-CFLAGS=-g -pg --std=c99 -pedantic -Wall -Werror -Wno-unused -I./ \
+CFLAGS=-ffast-math -O3 --std=c99 -pedantic -Wall -Werror -Wno-unused -I./ \
        $(LEVMAR_CC_FLAGS) $(EXTRA_CFLAGS)
 OPENCV_FLAGS=$(OPENCV_EXTRA_FLAGS) -lcxcore -lcv -lhighgui -lcvaux \
              -lml -DCV_NO_BACKWARD_COMPATIBILITY
