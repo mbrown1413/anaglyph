@@ -306,10 +306,16 @@ int main(int argc, char** argv)
 
         CvVideoWriter* output_writer;
         if (output_file != NULL) {
+            CvSize size;
+            if (side_by_side) {
+                size = cvSize(left_width/2, left_height);
+            } else {
+                size = cvSize(left_width, left_height);
+            }
             output_writer = cvCreateVideoWriter(output_file,
                 CV_FOURCC('M','J','P','G'), // Codec
                 20, // fps
-                cvSize(left_width, left_height),
+                size,
                 1 // is_color
             );
         }
