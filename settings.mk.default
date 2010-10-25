@@ -20,8 +20,8 @@ OPENCV_EXTRA_FLAGS=$(shell pkg-config --libs-only-L --cflags opencv)
 MULTITHREADING_FLAGS= -fopenmp -DUSE_OPENMP
 
 
-################## Mcallister Method Options ##################
+################## CIELab Method Options ##################
 
-# Uncommenting this causes the Mcallister method to print out statistics about
+# Uncommenting this causes the CIELab method to print out statistics about
 # the non-linear optimization done.
-#EXTRA_CFLAGS += -DMCALLISTER_STATISTICS
+#EXTRA_CFLAGS += -DCIELAB_METHOD_STATISTICS

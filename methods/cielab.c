@@ -1,5 +1,4 @@
-/** mcallister.c
- *
+/** cielab.c
  */
 
 // These are the six elements of "target" and "x"
@@ -90,7 +89,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
         right_eye_lab[2]
     };
 
-    #ifdef MCALLISTER_STATISTICS
+    #ifdef CIELAB_METHOD_STATISTICS
         float info[LM_INFO_SZ];
     #else
         float* info = NULL;
@@ -110,7 +109,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel)
     );
 
     // Record info
-    #ifdef MCALLISTER_STATISTICS
+    #ifdef CIELAB_METHOD_STATISTICS
         total_combines++;
         total_initial_gradient += info[0];
         total_iterations += info[5];
@@ -135,14 +134,14 @@ void method_init() {
     #else
         working_memory = (float*) malloc((LM_DIF_WORKSZ(3, 6))*sizeof(float));
     #endif
-    
+
     CIEmatricesLandR();
 
     // Verify the Jacobian
-    /* 
+    /*
     float err[18];
     float p[3] = {200, 100, 10};
-    slevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err); 
+    slevmar_chkjac(minimization_function, jacobian, p, 3, 6, NULL, err);
     for(int i=0; i<18; ++i) printf("Gradient %d, Error %g\n", i, err[i]);
     */
 
@@ -150,7 +149,7 @@ void method_init() {
 void method_free() {
 
     // Print recorded data
-    #ifdef MCALLISTER_STATISTICS
+    #ifdef CIELAB_METHOD_STATISTICS
         printf("\n");
         printf("Total pixel combines: %ld\n", total_combines);
         printf("Average initial gradient: %f\n", total_initial_gradient/total_combines);

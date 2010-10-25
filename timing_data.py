@@ -13,7 +13,7 @@ for image in images:
         command = [
             "time",
             "-f", '%e', # output total "real" time
-            "./bin/mcallister",
+            "./bin/cielab",
             image[1], image[2],
             "-o", "output.png",
         ]

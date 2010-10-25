@@ -5,7 +5,7 @@ Compiling process:
     - Maybe make levmar optional
     - Commands which only do compiling are given linking flags.  This generates warnings that may look like important errors to some people.  This happens on Mac's compiler, but not Linux's.
 
-For McAllister method:
+For CIELab method:
     - Write Jacobian and give it to levmar
     - Lookup table for minimization function
     - Statistics on what takes the longest in the levmar call
