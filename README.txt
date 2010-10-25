@@ -23,35 +23,39 @@ methods/
     Contains interface.h and one C file for each anaglyph method.
 
 ------------
-Dependencies
+External Dependencies
 ------------
 Required:
   * gcc
   * OpenCV
   * make
-  * levmar
 
 Optional:
-  * OpenCV FFMpeg Support - If you want to read video.
   * OpenMP - Used for multithreading.  To turn this off, see the multithreading
              option in settings.mk
+  * lapack - Library that levmar uses for faster non-linear solvers.
 
 Mac Specifics
 `````````````
-MacPorts can be used to install all of the above except for levmar.  Installing
-OpenCV will also install FFMpeg support and OpenMP.  For more details on Mac
-installation, read OpenCV's documentation:
+MacPorts can be used to install all of the above except for levmar and lapack.
+Installing OpenCV will also install FFMpeg support and OpenMP.  For more
+details on Mac installation, read OpenCV's documentation:
 
 http://opencv.willowgarage.com/wiki/Mac_OS_X_OpenCV_Port
 
 ---------
 Compiling
 ---------
-First, copy "settings.mk.default" to "settings.mk".  Next, open "settings.mk"
-and read through the options.  You will need to change some of these before
-compiling.
+First you need to compile levmar.  Go into the levmar/ directory, which is
+inside the root of the repository.  Next, run the "make" command inside this
+directory.  This should compile levmar with some sane defaults.  If needed,
+more details about compiling levmar can be found in levmar's "README.txt".
 
-To compile, type the "make" command inside the root of the repository.  The
+Change directories back to the root of the repository.  Copy
+"settings.mk.default" to "settings.mk".  Next, open "settings.mk" and read
+through the options.  You will need to change some of these before compiling.
+
+To compile, run the "make" command inside the root of the repository.  The
 executables generated, one for each method, will be placed in the bin/
 directory.
 
