@@ -26,7 +26,7 @@
 /************************************* Start of configuration options *************************************/
 
 /* specify whether to use LAPACK or not. The first option is strongly recommended */
-#define HAVE_LAPACK /* use LAPACK */
+//#define HAVE_LAPACK /* use LAPACK */
 /* #undef HAVE_LAPACK */  /* uncomment this to force not using LAPACK */
 
 /* to avoid the overhead of repeated mallocs(), routines in Axb.c can be instructed to
@@ -35,7 +35,7 @@
  * Bellow, this option is turned on only when not compiling with OpenMP.
  */
 #if !defined(_OPENMP) 
-#define LINSOLVERS_RETAIN_MEMORY /* comment this if you don't want routines in Axb.c retain working memory between calls */
+//#define LINSOLVERS_RETAIN_MEMORY /* comment this if you don't want routines in Axb.c retain working memory between calls */
 #endif
 
 /* determine the precision variants to be build. Default settings build
