@@ -83,7 +83,15 @@ void usage_message(char* program_name) {
         printf("    -f <frame_num>         A zero-indexed frame to read from the video.  Only \n");
         printf("                           this frame is read, and it is treated just as \n");
         printf("                           though images had been given.  This option implies\n");
-        printf("                           --video.\n");
+        printf("\n");
+        printf("    --frequency <frame_frequency>\n");
+        printf("    -fr <frame_frequency>  The frame rate of the output video. 20 FPS is the \n");
+	printf("			   default if none is provided.\n");
+        printf("\n");
+        printf("    --framebuffer <frame_buffer>\n");
+        printf("    -fb <frame_buffer>    The number of frames to look ahead when checking for\n");
+	printf("			   similar pixels. Default if 0. (Not implemented.)\n");
+        printf("\n");
         printf("    --side-by-side\n");
         printf("    -s                     Indicates that only one source file will be passed\n");
         printf("                           in.  This one file should contain the left and\n");
@@ -113,6 +121,8 @@ int main(int argc, char** argv)
     char* output_file = NULL;
     bool files_are_video = false;
     int video_frame = -1;
+    int frame_frequency = 20;
+    int frame_buffer = 0;
     bool side_by_side = false;
     for (int i=1; i<argc; i++) {
 
@@ -145,6 +155,28 @@ int main(int argc, char** argv)
                 usage_message(argv[0]);
             }
             video_frame = atoi(argv[i+1]);
+            i++; // Skip next arg
+
+        // video output frame rate (frequency)
+        } else if (strcmp(argv[i], "-fr") == 0 ||
+                   strcmp(argv[i], "--frequency") == 0)
+        {
+            if (i == argc-1) {
+                printf("\nError: Missing argument for -fr\n\n");
+                usage_message(argv[0]);
+            }
+            frame_frequency = atoi(argv[i+1]);
+            i++; // Skip next arg
+
+        // video frame bufer 
+        } else if (strcmp(argv[i], "-fb") == 0 ||
+                   strcmp(argv[i], "--framebuffer") == 0)
+        {
+            if (i == argc-1) {
+                printf("\nError: Missing argument for -fb\n\n");
+                usage_message(argv[0]);
+            }
+            frame_buffer = atoi(argv[i+1]);
             i++; // Skip next arg
 
         // Side by Side
@@ -314,7 +346,7 @@ int main(int argc, char** argv)
             }
             output_writer = cvCreateVideoWriter(output_file,
                 CV_FOURCC('M','J','P','G'), // Codec
-                20, // fps
+                frame_frequency, // fps
                 size,
                 1 // is_color
             );
