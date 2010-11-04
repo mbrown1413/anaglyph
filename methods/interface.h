@@ -13,7 +13,7 @@
  *
  * This method is not required to do anything, but it is required to be defined
  * inside the method file.
- */ 
+ */
 void method_init(void);
 
 /** method_combine_pixels
@@ -40,7 +40,7 @@ CvScalar method_combine_pixels(CvScalar left_pixel, CvScalar right_pixel);
  *
  * This method is not required to do anything, but it is required to be defined
  * inside the method file.
- */ 
+ */
 void method_free(void);
 
 #endif

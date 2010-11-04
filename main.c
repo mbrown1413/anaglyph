@@ -56,7 +56,9 @@ IplImage* combine_stereo_side_by_side(IplImage* src)
             left_pixel = cvGet2D(src, y, x);
             right_pixel = cvGet2D(src, y, x+dst->width);
             stereo_pixel = method_combine_pixels(
-                left_pixel, right_pixel
+                right_pixel, left_pixel // Side by side are meant to be viewed
+                // cross-eyed, so the image on the left is displayed to the
+                // right eye, and vice versa.
             );
             cvSet2D(dst, y, x, stereo_pixel);
         }
@@ -97,8 +99,10 @@ void usage_message(char* program_name) {
         printf("                           in.  This one file should contain the left and\n");
         printf("                           right eye in the same image or frame.  The\n");
         printf("                           image/frames are split in half down the middle so\n");
-        printf("                           that the left image is on the left side and the\n");
-        printf("                           right image is on the right side.\n");
+        printf("                           that the right image is on the left side and the\n");
+        printf("                           left image is on the right side (switched because\n");
+        printf("                           input images like this are meant to be viewed\n");
+        printf("                           cross-eyed, which switches the eyes).\n");
         exit(1);
 }
 
@@ -168,7 +172,7 @@ int main(int argc, char** argv)
             frame_frequency = atoi(argv[i+1]);
             i++; // Skip next arg
 
-        // video frame bufer 
+        // video frame bufer
         } else if (strcmp(argv[i], "-fb") == 0 ||
                    strcmp(argv[i], "--framebuffer") == 0)
         {
