@@ -1,63 +1,48 @@
 from tasks import McAllisterVideoTask, McAllisterAnaglyphTask
 import ctypes
 from celery.task.sets import TaskSet
+import cv
+import sys
+import opencv
 
-CV_CAP_PROP_POS_MSEC = 0 
-CV_CAP_PROP_POS_FRAMES = 1 
-CV_CAP_PROP_POS_AVI_RATIO = 2 
-CV_CAP_PROP_FRAME_WIDTH = 3 
-CV_CAP_PROP_FRAME_HEIGHT = 4 
-CV_CAP_PROP_FPS = 5 
-CV_CAP_PROP_FOURCC = 6 
-CV_CAP_PROP_FRAME_COUNT = 7 
+sys.path.append("/usr/local/lib/python2.6/site-packages")
+
 
 def dispatch_video(**params):
+    opencv = ctypes.cdll.LoadLibrary("libopencv.so")
+    left_video = opencv.cvCreateFileCapture(params['left_video'])
+    print params['left_video']
+    left_number_frames = opencv.cvGetCaptureProperty(left_video, CV_CAP_PROP_FRAME_COUNT)
+    height = opencv.cvGetCaptureProperty(left_video, CV_CAP_PROP_FRAME_HEIGHT)
+    width = opencv.cvGetCaptureProperty(left_video, CV_CAP_PROP_FRAME_WIDTH)
+    print opencv.cvGetCaptureProperty(left_video, 0)
+    print opencv.cvGetCaptureProperty(left_video, 1)
+    print opencv.cvGetCaptureProperty(left_video, 2)
+    print opencv.cvGetCaptureProperty(left_video, 3)
+    print opencv.cvGetCaptureProperty(left_video, 4)
+    print opencv.cvGetCaptureProperty(left_video, 5)
+    print opencv.cvGetCaptureProperty(left_video, 6)
+    print opencv.cvGetCaptureProperty(left_video, 7)
+    output = opencv.cvCreateVideoWriter(params['combined_name']+".avi", opencv.CV_FOURCC('M','J','P','G'), 20, opencv.CvSize(width/2, height), True)
 
     #"/home/michael/anaglyph/sw-L/left.avi"
 
-    highgui = ctypes.cdll.LoadLibrary("libhighgui.so")
-    left_video = highgui.cvCreateFileCapture(params['left_video'])
-    print params['left_video']
-    left_number_frames = highgui.cvGetCaptureProperty(left_video, CV_CAP_PROP_FRAME_COUNT)
-    height = highgui.cvGetCaptureProperty(left_video, CV_CAP_PROP_FRAME_HEIGHT)
-    width = highgui.cvGetCaptureProperty(left_video, CV_CAP_PROP_FRAME_WIDTH)
-    print highgui.cvGetCaptureProperty(left_video, 0)
-    print highgui.cvGetCaptureProperty(left_video, 1)
-    print highgui.cvGetCaptureProperty(left_video, 2)
-    print highgui.cvGetCaptureProperty(left_video, 3)
-    print highgui.cvGetCaptureProperty(left_video, 4)
-    print highgui.cvGetCaptureProperty(left_video, 5)
-    print highgui.cvGetCaptureProperty(left_video, 6)
-    print highgui.cvGetCaptureProperty(left_video, 7)
-    output = highgui.cvCreateVideoWriter(params['combined_name']+".avi", CV_FOURCC('M','J','P','G'), 20, CvSize(width/2, height), True)
     the_subtasks = []
     results = {}
     #for i in xrange(left_number_frames):
-    for i in xrange(500):        
-	results[i] = McAllisterVideoTask.delay(left_video=params['left_video'],right_video="-s",frame=str(i),      
-combined_name=params['combined_name'])
-
-    current = 0    
+    for i in xrange(2500):
+        results[i] = McAllisterVideoTask.delay(left_video=params['left_video'],right_video="-s",frame=str(i),combined_name=params['combined_name'])
+    
+    current = 0
     while (results):
         if (results[current].ready()):
             task_result = results.pop(current).result
-            print task_result
-            #print '%(combined_name)s%(frame)s.png' % task_result
-            next_frame = cv.LoadImage('%(combined_name)s%(frame)s.png' % task_result)
-            cv.WriteFrame(output, next_frame)
+            print '%(combined_name)s%(frame)s.png' % task_result
+            next_frame = opencv.cvLoadImage('%(combined_name)s%(frame)s.png' % task_result)
+            opencv.cvWriteFrame(output, next_frame)
             current = current + 1
 
-def CV_FOURCC( c1, c2, c3, c4 ) :
-    return (((ord(c1))&255)             \
-                + (((ord(c2))&255)<<8)  \
-                + (((ord(c3))&255)<<16) \
-                + (((ord(c4))&255)<<24))
-
-class CvSize(ctypes.Structure):
-    _fields_ = [("width", ctypes.c_int),
-                ("height", ctypes.c_int)]
-
-
+        
 def test_image():
     dispatch_image(left_image="/home/dkliban/anaglyph/images/david-left.jpg", right_image="/home/dkliban/anaglyph/images/david-right.jpg", combined_image="/home/dkliban/anaglyph/davidddd.png")
 
