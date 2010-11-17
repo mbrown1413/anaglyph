@@ -29,7 +29,10 @@ def dispatch_video(**params):
         results[i] = McAllisterVideoTask.delay(left_video=params['left_video'],right_video="-s",frame=str(i),combined_name=params['combined_name'])
     
     current = 0
+    tt = 0
     while (results):
+        tt = tt + 1
+        print tt
         if (results[current].ready()):
             task_result = results.pop(current).result
             print '%(combined_name)s%(frame)s.png' % task_result

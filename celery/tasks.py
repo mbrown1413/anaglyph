@@ -17,5 +17,5 @@ def McAllisterVideoTask(**kwargs):
     print 'handling task: Frame %(frame)s, of %(combined_name)s' % kwargs
     args = ["/home/dkliban/anaglyph/bin/cielab", kwargs["left_video"], kwargs["right_video"], "-o", kwargs["combined_name"]+kwargs["frame"]+".png", "-v", "-f", kwargs["frame"]]
     p = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[0]
-    print 'Oout: %s' % p
+    print args
     return kwargs
