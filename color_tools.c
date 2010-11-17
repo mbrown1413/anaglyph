@@ -29,19 +29,15 @@ float CIEmatrixR[3][3];
 
 void mult_matrices(float a[][3], float b[3], float result[3])
 {
-    for (int i=0; i<3; i++) {
-        result[i] = 0;
-    }
-    int i, j;
-    for(i=0; i<3; i++)
-    {
-        for(j=0; j<3; j++)
-        {
-     //           printf("a[%d][%d] = %f\n", i, j, a[i][j]);
-       //         printf("b[%d] = %f\n", j, b[j]);
-            result[i] += a[i][j] * b[j];
-        }
-   }
+    result[0] = a[0][0] * b[0] +
+                a[0][1] * b[1] +
+                a[0][2] * b[2];
+    result[1] = a[1][0] * b[0] +
+                a[1][1] * b[1] +
+                a[1][2] * b[2];
+    result[2] = a[2][0] * b[0] +
+                a[2][1] * b[1] +
+                a[2][2] * b[2];
 }
 
 void print_matrix(float a[3])
@@ -135,6 +131,43 @@ float Bstar(float x, float y, float z)
     return (200.0 * (cielabf(y, Yn) - cielabf(z, Zn)));
 }
 
+void xyz_to_lab(float xyz[], float lab[]) {
+    float cielabf_y_Yn = cielabf(xyz[1], Yn);
+    lab[0] = 116.0 * cielabf_y_Yn - 16.0;
+    lab[1] = 500.0 * (cielabf(xyz[0], Xn) - cielabf_y_Yn);
+    lab[2] = 200.0 * (cielabf_y_Yn - cielabf(xyz[2], Zn));
+}
+
+/**
+ * Computes the lab coordinates of the given rgb value, not seen through any filter.
+ *
+ * Normalized by the CIEmatrixL for the left eye filter.  This is why there are
+ * two different functions for rgb to lab without a filter.
+ */
+void rgb_to_lab_without_left_filter(float rgb[], float lab[]) {
+    float cie_xyz[3];
+    mult_matrices(CIEmatrixL, rgb, cie_xyz);
+    xyz_to_lab(cie_xyz, lab);
+}
+
+/**
+ * Computes the lab coordinates of the given rgb value, not seen through any filter.
+ *
+ * Normalized by the CIEmatrixR for the right eye filter.  This is why there
+ * are two different functions for rgb to lab without a filter.
+ */
+void rgb_to_lab_without_right_filter(float rgb[], float lab[]) {
+    float cie_xyz[3];
+    mult_matrices(CIEmatrixR, rgb, cie_xyz);
+    xyz_to_lab(cie_xyz, lab);
+}
+
+/**
+ * Computes the L coordinate in lab space of the given rgb value, not seen
+ * through any filter.
+ *
+ * Normalized by the CIEmatrixL for the left eye filter.
+ */
 float Lstarleft(float rgb[3])
 {
     float CIEmatrixLeft[3];
@@ -153,6 +186,12 @@ float Lstarleft(float rgb[3])
 
 }
 
+/**
+ * Computes the A coordinate in lab space of the given rgb value, not seen
+ * through any filter.
+ *
+ * Normalized by the CIEmatrixL for the left eye filter.
+ */
 float Astarleft(float rgb[3])
 {
     float CIEmatrixLeft[3];
@@ -163,6 +202,12 @@ float Astarleft(float rgb[3])
 
 }
 
+/**
+ * Computes the B coordinate in lab space of the given rgb value, not seen
+ * through any filter.
+ *
+ * Normalized by the CIEmatrixL for the left eye filter.
+ */
 float Bstarleft(float rgb[3])
 {
     float CIEmatrixLeft[3];
@@ -172,6 +217,12 @@ float Bstarleft(float rgb[3])
     return test;
 }
 
+/**
+ * Computes the L coordinate in lab space of the given rgb value, not seen
+ * through any filter.
+ *
+ * Normalized by the CIEmatrixR for the right eye filter.
+ */
 float Lstarright(float rgb[3])
 {
     float CIEmatrixRight[3];
@@ -188,6 +239,12 @@ float Lstarright(float rgb[3])
     return test;
 }
 
+/**
+ * Computes the A coordinate in lab space of the given rgb value, not seen
+ * through any filter.
+ *
+ * Normalized by the CIEmatrixR for the right eye filter.
+ */
 float Astarright(float rgb[3])
 {
     float CIEmatrixRight[3];
@@ -196,6 +253,12 @@ float Astarright(float rgb[3])
 
 }
 
+/**
+ * Computes the B coordinate in lab space of the given rgb value, not seen
+ * through any filter.
+ *
+ * Normalized by the CIEmatrixR for the right eye filter.
+ */
 float Bstarright(float rgb[3])
 {
     float CIEmatrixRight[3];
@@ -204,11 +267,36 @@ float Bstarright(float rgb[3])
 
 }
 
+/**
+ * Converts the given rgb color to CIEXYZ space, given the conversion matrix A.
+ */
 void CIE(float A[][3], float rgb[3], float result[3])
 {
     mult_matrices(A, rgb, result);
 }
 
+/**
+ * Computes the lab coordinates of the given rgb value, seen through the left filter.
+ */
+void rgb_to_lab_through_left_filter(float rgb[], float lab[]){
+    float CIELeft[3];
+    CIE(Al, rgb, CIELeft);
+    xyz_to_lab(CIELeft, lab);
+}
+
+/**
+ * Computes the lab coordinates of the given rgb value, seen through the left filter.
+ */
+void rgb_to_lab_through_right_filter(float rgb[], float lab[]){
+    float CIERight[3];
+    CIE(Ar, rgb, CIERight);
+    xyz_to_lab(CIERight, lab);
+}
+
+/**
+ * Computes the L coordinate in Lab space of the given rgb pixel as seen
+ * through the left filter.
+ */
 float CLstarLeft(float rgb[3]) 
 {
     float CIELeft[3];
@@ -216,6 +304,10 @@ float CLstarLeft(float rgb[3])
     return Lstar(CIELeft[0], CIELeft[1], CIELeft[2]);
 }
 
+/**
+ * Computes the A coordinate in Lab space of the given rgb pixel as seen
+ * through the left filter.
+ */
 float CAstarLeft(float rgb[3])
 {
     float CIELeft[3];
@@ -223,6 +315,10 @@ float CAstarLeft(float rgb[3])
     return Astar(CIELeft[0], CIELeft[1], CIELeft[2]);
 }
 
+/**
+ * Computes the B coordinate in Lab space of the given rgb pixel as seen
+ * through the left filter.
+ */
 float CBstarLeft(float rgb[3])
 {
     float CIELeft[3];
@@ -231,6 +327,10 @@ float CBstarLeft(float rgb[3])
     return Bstar(CIELeft[0], CIELeft[1], CIELeft[2]);
 }
 
+/**
+ * Computes the L coordinate in Lab space of the given rgb pixel as seen
+ * through the right filter.
+ */
 float CLstarRight(float rgb[3]) 
 {
     float CIEright[3];
@@ -238,6 +338,10 @@ float CLstarRight(float rgb[3])
     return Lstar(CIEright[0], CIEright[1], CIEright[2]);
 }
 
+/**
+ * Computes the A coordinate in Lab space of the given rgb pixel as seen
+ * through the right filter.
+ */
 float CAstarRight(float rgb[3])
 {
     float CIEright[3];
@@ -245,6 +349,10 @@ float CAstarRight(float rgb[3])
     return Astar(CIEright[0], CIEright[1], CIEright[2]);
 }
 
+/**
+ * Computes the B coordinate in Lab space of the given rgb pixel as seen
+ * through the right filter.
+ */
 float CBstarRight(float rgb[3])
 {
     float CIEright[3];
