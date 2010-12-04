@@ -21,7 +21,7 @@
 float opts[5] = {
     0.01, // Scale factor for initial \mu
     0.1, // Stopping threshold for ||J^t e||_inf
-    0.0001, // Stopping threshold for ||Dp||_2
+    0.00001, // Stopping threshold for ||Dp||_2
     10, // Stopping threshold for ||e||_2
     LM_DIFF_DELTA*20000 // Step difference when using difference jacobian approx
 };
