@@ -1,5 +1,18 @@
 from celery.decorators import task
 import shlex, subprocess
+import cv
+
+
+@task
+def AnaglyphFrameTask(**kwargs):
+    frame = kwargs['frame']
+    cv_im = cv.CreateImage(kwargs['size'], cv.IPL_DEPTH_8U, 3)
+    cv.SetData(cv_im, frame, kwargs['size'][0]*3)
+    cv.SaveImage("/home/dkliban/anaglyph/images/tmp.bmp", cv_im)
+    args = ["/home/dkliban/anaglyph/bin/cielab", "/home/dkliban/anglyph/images/tmp.bmp", kwargs["right_image"], "-o", kwargs["combined_image"]]
+    p = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[0]
+    print args
+    return kwargs
 
 @task
 def McAllisterAnaglyphTask(**kwargs):
