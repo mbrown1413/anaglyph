@@ -225,24 +225,13 @@ int main(int argc, char** argv)
         if (video_frame > -1) { // Reading one frame from video
 
             CvCapture* left_eye_capture = open_video(left_eye_string);
-            //cvSetCaptureProperty(left_eye_capture, CV_CAP_PROP_POS_FRAMES, video_frame);
+            cvSetCaptureProperty(left_eye_capture, CV_CAP_PROP_POS_FRAMES, video_frame);
             left_eye = cvQueryFrame(left_eye_capture);
 
-            CvCapture* right_eye_capture = NULL;
             if (!side_by_side) {
-                right_eye_capture = open_video(right_eye_string);
-                //cvSetCaptureProperty(right_eye_capture, CV_CAP_PROP_POS_FRAMES, video_frame);
-                //right_eye = cvQueryFrame(right_eye_capture);
-            }
-
-            // Skip Ahead
-            for (int i=0; i<video_frame; i++) {
-                cvGrabFrame(left_eye_capture);
-                if (!side_by_side) {
-                    cvGrabFrame(right_eye_capture);
-                }
-                left_eye = cvRetrieveFrame(left_eye_capture, 0);
-                right_eye = cvRetrieveFrame(right_eye_capture, 0);
+                CvCapture* right_eye_capture = open_video(right_eye_string);
+                cvSetCaptureProperty(right_eye_capture, CV_CAP_PROP_POS_FRAMES, video_frame);
+                right_eye = cvQueryFrame(right_eye_capture);
             }
 
         } else { // Reading from image files
