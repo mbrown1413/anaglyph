@@ -5,13 +5,16 @@ import memcache
 
 @task
 def MemcacheAnaglyphTask(**kwargs):
-    mc = memcache.Client(['localhost:11211'], debug=1)
+    mc = memcache.Client(['152.14.17.125:11211'], debug=1)
     frame = mc.get("%(frame)s" % kwargs)
-    print "test?"
-    print frame
-    #cv_im = cv.CreateImage(kwargs['size'], cv.IPL_DEPTH_8U, 3)
-    #cv.SetData(cv_im, frame, kwargs['size'][0]*3)
-    #cv.SaveImage("/home/dkliban/anaglyph/images/tmp.bmp", cv_im)
+    #mc.delete("%(frame)s" % kwargs)
+    cv_im = cv.CreateImage(kwargs['size'], cv.IPL_DEPTH_8U, 3)
+    cv.SetData(cv_im, frame, kwargs['size'][0]*3)
+    cv.SaveImage("/home/dkliban/anaglyph/images/tmp.bmp",cv_im)
+    args = ["/home/dkliban/anaglyph/bin/cielab", "/home/dkliban/anaglyph/images/tmp.bmp", kwargs["right_image"], "-o", kwargs["combined_image"]]
+    p = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[0]
+    print args
+    return kwargs
 
 @task
 def AnaglyphFrameTask(**kwargs):
