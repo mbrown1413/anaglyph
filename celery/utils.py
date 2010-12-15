@@ -1,6 +1,8 @@
-from tasks import McAllisterVideoTask, McAllisterAnaglyphTask, AnaglyphFrameTask
+from tasks import MemcacheAnaglyphTask, McAllisterVideoTask, McAllisterAnaglyphTask, AnaglyphFrameTask
 import ctypes
 from celery.task.sets import TaskSet
+from celery.task.control import Control
+from celery.app import app_or_default
 import cv
 import sys
 import os.path
@@ -17,10 +19,13 @@ def write_frame(**params):
     cv.SaveImage("%(name)s/%(frame)s.bmp" % params, frame)
 
 def memcache_frame(**params):
-    mc = memcache.Client(['opus-dev.cnl.ncsu.edu:11211'], debug=0)
+    mc = memcache.Client(['localhost:11211'], debug=1)
     video = params['video']
-    frame = cv.QueryFrame(video)
-    mc.set("%(name)s/%(frame)s.bmp" % params, frame)
+    frame = cv.QueryFrame(video).tostring().__str__()
+    mc.set("%(frame)s" % params, frame)
+    #r = mc.get("%(frame)s" % params)
+    #if r is None:
+    #    print "Couldn't retrieve from memcache"
 
 def dispatch_frames(**params):
     batch_size = params['batch_size']
@@ -57,6 +62,30 @@ def dispatch_full_frames(**params):
     data['average_dispatch'] = (end_time - start_time)/batch_size
     return data
 
+def dispatch_memcache_frames(**params):
+    batch_size = params['batch_size']
+    start_id = params['start_id']
+    video = params['video']
+    size = params['size']
+
+    the_subtasks = []
+    data = {}
+    start_time = time()
+    for i in xrange(start_id, start_id+batch_size):
+        memcache_frame(video=video, frame=i, name=params['name']) 
+        the_subtasks.append(MemcacheAnaglyphTask.subtask(size=size, frame=i, name=params['name'],left_image="%(name)s/%(frame)s.bmp" % {'name': params['name'],'frame':i},right_image="-s",combined_image="%(name)s/%(frame)sC.bmp" % {'name': params['name'], 'frame':i}))
+    job = TaskSet(tasks=the_subtasks)
+    results = job.apply_async();
+    end_time = time()
+    data['batch_size'] = batch_size
+    data['average_dispatch'] = (end_time - start_time)/batch_size
+    return data
+
+def revoke_all_tasks():
+    c = Control(app_or_default())
+    print c.discard_all()
+
+    
 
 def write_and_dispatch(**params):
     name = params['name']
@@ -91,7 +120,7 @@ def dispatch_video_test(**params):
     for i in xrange(200):
         cv.QueryFrame(video)
     frame = 200
-    for i in xrange(1,10):
+    for i in xrange(1,2):
         data = {}
         data['batch_size'] = i
         data['average_dispatch'] = 0
@@ -124,7 +153,7 @@ def dispatch_video_frames(**params):
         data['batch_size'] = i
         data['average_dispatch'] = 0
         for j in xrange(100):
-            datapoint = dispatch_full_frames(size=size, name=name, batch_size=i, video=video, start_id=frame)
+            datapoint = dispatch_memcache_frames(size=size, name=name, batch_size=i, video=video, start_id=frame)
             frame = frame + i
             data['average_dispatch'] = data['average_dispatch'] + datapoint['average_dispatch']
         data['average_dispatch'] = data['average_dispatch'] / 100
@@ -176,6 +205,22 @@ def dispatch_video(**params):
     #        cv.WriteFrame(output, next_frame)
     #        current = current + 1
 
+
+def build_video(**params):
+    number_frames = params['number_frames']
+    frame_rate = params['frame_rate']
+    width = params['size'][0]
+    height = params['size'][1]
+
+    output = cv.CreateVideoWriter(params['combined_name']+".avi", cv.FOURCC('M','J','P','G'), frame_rate, (width/2, height), 1)
+    for i in xrange(number_frames):
+        while(not os.path.isfile("%(name)s/%(fn)sC.bmp" % {'name':params['combined_name'], 'fn':i})):
+            pass
+        next_frame = cv.LoadImage("%(name)s/%(fn)sC.bmp" %   
+                {'name':params['combined_name'], 'fn':i})
+        print "%(name)s/%(fn)sC.bmp" % {'name':params['combined_name'], 'fn':i}
+        cv.WriteFrame(output, next_frame)
+    
         
 def test_image():
     dispatch_image(left_image="/home/dkliban/anaglyph/images/david-left.jpg", right_image="/home/dkliban/anaglyph/images/david-right.jpg", combined_image="/home/dkliban/anaglyph/davidddd.png")

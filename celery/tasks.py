@@ -1,7 +1,17 @@
 from celery.decorators import task
 import shlex, subprocess
 import cv
+import memcache
 
+@task
+def MemcacheAnaglyphTask(**kwargs):
+    mc = memcache.Client(['localhost:11211'], debug=1)
+    frame = mc.get("%(frame)s" % kwargs)
+    print "test?"
+    print frame
+    #cv_im = cv.CreateImage(kwargs['size'], cv.IPL_DEPTH_8U, 3)
+    #cv.SetData(cv_im, frame, kwargs['size'][0]*3)
+    #cv.SaveImage("/home/dkliban/anaglyph/images/tmp.bmp", cv_im)
 
 @task
 def AnaglyphFrameTask(**kwargs):
