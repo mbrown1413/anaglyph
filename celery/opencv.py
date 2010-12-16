@@ -102,6 +102,8 @@ c_float_p = POINTER(c_float)
 c_double_p = POINTER(c_double)
 size_t = c_uint
 
+sys.path.append("/usr/local/lib/python2.6/site-packages")
+
 import math
 # ----Load the DLLs ----------------------------------------------------------
 # modified a little bit by Minh-Tri Pham

@@ -52,6 +52,3 @@ bin/:
 methods/bin/:
 	-mkdir methods/bin
 
-clean:
-	-rm bin/*
-	-rm methods/bin/*.o
