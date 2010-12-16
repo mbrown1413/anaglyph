@@ -13,6 +13,7 @@ def MemcacheAnaglyphTask(**kwargs):
     args = ["/home/dkliban/anaglyph/bin/cielab", "/home/dkliban/anaglyph/images/tmp.bmp", kwargs["right_image"], "-o", kwargs["combined_image"]]
     p = subprocess.Popen(args, stdout=subprocess.PIPE).communicate()[0]
     print args
+    mc.disconnect_all()
     return kwargs
 
 @task
