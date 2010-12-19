@@ -16,4 +16,5 @@ urlpatterns = patterns('',
     # (r'^admin/', include(admin.site.urls)),
 
     (r'^anaglyph/', include('anaglyph.urls')),
+    (r'^/?$', include('anaglyph.urls')),
 )

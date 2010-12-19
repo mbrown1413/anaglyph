@@ -1,7 +1,7 @@
 import os.path
 # Django settings for web project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -76,7 +76,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'web.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -96,14 +96,20 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
 )
 
+def get_parent_directory():
+    return os.path.realpath(os.path.join(
+        os.path.abspath(__file__),
+        "../.."
+    ))
+
 ################## Anaglyph Settings ################## 
-BASE_PATH = "../" # Absolute path of the repository root
+BASE_PATH = get_parent_directory() # Absolute path of the repository root
 STEREO_DIRECTORY = os.path.join(BASE_PATH, "web/tmp/stereo/")
 IMAGE_DIRECTORY = os.path.join(BASE_PATH, "web/tmp/images/")
-METHODS = { # Maps a method name to the executable path
-    'Photoshop': os.path.join(BASE_PATH, 'bin/photoshop'),
-    'Modified Photoshop': os.path.join(BASE_PATH, 'bin/modified_photoshop'),
-    'LS CIE': os.path.join(BASE_PATH, 'bin/least_squares'),
+METHODS = { # Maps a pretty method name to the executable path
+    #'Photoshop': os.path.join(BASE_PATH, 'bin/photoshop'),
+    #'Modified Photoshop': os.path.join(BASE_PATH, 'bin/modified_photoshop'),
+    #'LS CIE': os.path.join(BASE_PATH, 'bin/least_squares'),
     'LS CIELab': os.path.join(BASE_PATH, 'bin/cielab'),
 }
-DEFAULT_METHOD = 'LS CIELab' # This must be one of the keys of METHODS
+DEFAULT_METHOD = 'LS CIELab'

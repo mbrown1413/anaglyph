@@ -7,7 +7,7 @@ from django import forms
 from django.shortcuts import render_to_response
 from django.conf import settings
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 
 class AnaglyphCalculateForm(forms.Form):
     choices = ((method, method) for method in settings.METHODS.keys())
@@ -50,7 +50,7 @@ def save_file(file_object):
             destination.write(chunk)
         destination.close()
 
-    return filename
+    return os.path.basename(filename)
 
 def calculate_anaglyph(executable, left_eye_filename, right_eye_filename):
     '''Calculates the anaglyph and returns an open file of the result.'''
@@ -62,25 +62,32 @@ def calculate_anaglyph(executable, left_eye_filename, right_eye_filename):
         right_eye_filename,
         "-o", stereo_filename,
     ]
-    print ' '.join(command)
     p = Popen(command, stdout=PIPE)
     p.wait()
     return open(stereo_filename)
 
-def calculate_view(request):
-    if request.method == 'POST':
+def calculate_view(request, method):
+    stereo_file = calculate_anaglyph(
+        settings.METHODS[method],
+        os.path.join(settings.IMAGE_DIRECTORY, request.GET['left_eye']),
+        os.path.join(settings.IMAGE_DIRECTORY, request.GET['right_eye']),
+    )
+    response = HttpResponse(stereo_file, mimetype="image/png")
+    response['Content-Disposition'] = 'attachment; filename=anaglyph.png'
+    return response
+
+def upload_view(request):
+    if 'method' in request.POST:
 
         form = AnaglyphCalculateForm(request.POST, request.FILES)
         if form.is_valid():
 
             left_eye_filename = save_file(request.FILES['left_eye'])
             right_eye_filename = save_file(request.FILES['right_eye'])
-            stereo_file = calculate_anaglyph(
-                settings.METHODS[request.POST['method']],
-                left_eye_filename,
-                right_eye_filename,
-            )
-            return HttpResponse(stereo_file, mimetype="image/png")
+
+            return HttpResponseRedirect(
+                "/anaglyph/calculate/%s?left_eye=%s&right_eye=%s" %
+                (request.POST['method'], left_eye_filename, right_eye_filename))
 
     else: # First time at page
         form = AnaglyphCalculateForm()
