@@ -1,6 +1,13 @@
-makefile
+*.swp
+*.o
+*.pyc
+*.a
+
 bin/*
 images/*
 methods/bin/*
-*.swp
+web/tmp/
+
 settings.mk
+makefile
+levmar/lmdemo
