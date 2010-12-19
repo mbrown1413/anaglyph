@@ -4,19 +4,19 @@
 #include "color_tools.h"
 
 float Al[3][3] = {
-    {0.1840, 0.0179, 0.0048}, 
-    {0.0876, 0.0118, 0.0018}, 
-    {0.0005, 0.0012, 0.0159}
+    {5.42327, .807004, .047325},
+    {2.70972, .50201, .0250529},
+    {.0000550941, .000411221, .00240686}
 };
 float Ar[3][3] = {
-    {0.0153, 0.1092, 0.1171}, 
-    {0.0176, 0.3088, 0.0777}, 
-    {0.0201, 0.1016, 0.6546}
+    {.180431, 1.6395, 2.00309},
+    {.448214, 6.31551, 1.35757},
+    {.289201, 2.3925, 11.062}
 };
 float CIEmatrix[3][3] = {
-    {0.4243, 0.3105, 0.1657}, 
-    {0.2492, 0.6419, 0.1089}, 
-    {0.0265, 0.1225, 0.8614}
+    {11.6638, 8.3959, 4.65843},
+    {7.10807, 16.6845, 2.45008},
+    {.527874, 3.79124, 24.0604}
 };
 
 float Xn = 111.144;
@@ -42,19 +42,19 @@ void mult_matrices(float a[][3], float b[3], float result[3])
 
 void print_matrix(float a[3])
 {
-   int i; 
+   int i;
    for (i=0; i<3; i++)
    {
             //printf("%f\n", a[i]);
    }
 }
 
-/* CIEL*a*b* color transformation equations 
-* Xn, Yn, Zn are tristimulous values of reference white.  
-*The values used in the CIEmatrix, Al, and Ar are the LCD values 
-from the Uniform Metric paper 
-* The Al and Ar matrices give the set of values to multiply the rgb 
-values from the picture by to get the correct filter colors for the 
+/* CIEL*a*b* color transformation equations
+* Xn, Yn, Zn are tristimulous values of reference white.
+*The values used in the CIEmatrix, Al, and Ar are the LCD values
+from the Uniform Metric paper
+* The Al and Ar matrices give the set of values to multiply the rgb
+values from the picture by to get the correct filter colors for the
 left and right eye views
 */
 
@@ -81,7 +81,7 @@ void CIEmatricesLandR()
     for(int i=3; i<6; i++){
         n[i] = CIErightconstant[i-3] / CIEmatrixrightconstant[i-3];
     }
-    
+
     //reset the CIE conversion for the left and right eye RGB values
     element_wise_multiply(CIEmatrix, n, CIEmatrixL);
     element_wise_multiply(CIEmatrix, &n[3], CIEmatrixR);
@@ -112,7 +112,7 @@ float cielabf(float U, float Un)
     return returnval;
 }
 
-float Lstar(float x, float y, float z) 
+float Lstar(float x, float y, float z)
 {
     float r = (116.0 * cielabf(y, Yn) - 16.0);
     //printf("Lstar is %f\n", r);
@@ -126,7 +126,7 @@ float Astar(float x, float y, float z)
     return r;
 }
 
-float Bstar(float x, float y, float z) 
+float Bstar(float x, float y, float z)
 {
     return (200.0 * (cielabf(y, Yn) - cielabf(z, Zn)));
 }
@@ -196,7 +196,7 @@ float Astarleft(float rgb[3])
 {
     float CIEmatrixLeft[3];
     mult_matrices(CIEmatrixL, rgb, CIEmatrixLeft);
-    float test = Astar(CIEmatrixLeft[0], CIEmatrixLeft[1], CIEmatrixLeft[2]); 
+    float test = Astar(CIEmatrixLeft[0], CIEmatrixLeft[1], CIEmatrixLeft[2]);
     //printf("Astarleft is %f\n", test);
     return test;
 
@@ -297,7 +297,7 @@ void rgb_to_lab_through_right_filter(float rgb[], float lab[]){
  * Computes the L coordinate in Lab space of the given rgb pixel as seen
  * through the left filter.
  */
-float CLstarLeft(float rgb[3]) 
+float CLstarLeft(float rgb[3])
 {
     float CIELeft[3];
     CIE(Al, rgb, CIELeft);
@@ -331,7 +331,7 @@ float CBstarLeft(float rgb[3])
  * Computes the L coordinate in Lab space of the given rgb pixel as seen
  * through the right filter.
  */
-float CLstarRight(float rgb[3]) 
+float CLstarRight(float rgb[3])
 {
     float CIEright[3];
     CIE(Ar, rgb, CIEright);
