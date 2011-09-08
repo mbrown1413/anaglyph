@@ -21,9 +21,9 @@ images/
 methods/
     Contains interface.h and one C file for each anaglyph method.
 
-------------
+---------------------
 External Dependencies
-------------
+---------------------
 Required:
   * gcc
   * OpenCV
@@ -35,7 +35,7 @@ Optional:
   * lapack - Library that levmar uses for faster non-linear solvers.  Read in
              levmar's README.txt about how to compile levmar with lapack.
 
-Note that the video and image files that can be read and written are dependant
+Note that the video and image files that can be read and written are dependent
 on what libraries are available to OpenCV.
 
 Mac Specifics
@@ -62,7 +62,7 @@ added to make levmar optional.
 Next you need to create your settings file.  Change directories back to the
 root of the repository.  Copy "settings.mk.default" to "settings.mk".  Open
 "settings.mk" and read through the options.  You will need to change some of
-these before compiling.
+these before compiling.  Read the comments in settings.mk for details.
 
 To compile, run the "make" command inside the root of the repository.  The
 executables generated, one for each method, will be placed in the bin/
@@ -89,3 +89,4 @@ file will be put in bin/.
 Look in methods/interface.h.  This is the exact set of function prototypes that
 you need to have in your .c file.  Read methods/interface.h for documentation
 on exactly what these functions do, and when they are called.
+
